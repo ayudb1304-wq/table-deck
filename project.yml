@@ -69,6 +69,20 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.holo.HoloCoreTests
         GENERATE_INFOPLIST_FILE: YES
+  HoloAppTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - path: Tests/HoloAppTests
+      - path: Sources/HoloApp/AppSection.swift
+      - path: Sources/HoloApp/GuidedNavigationGate.swift
+      - path: Sources/HoloApp/SensingStrategyResolver.swift
+    dependencies:
+      - target: HoloCore
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.holo.HoloAppTests
+        GENERATE_INFOPLIST_FILE: YES
   HoloSoak:
     type: tool
     platform: macOS
@@ -104,6 +118,7 @@ schemes:
       config: Debug
       targets:
         - HoloCoreTests
+        - HoloAppTests
   HoloSoak:
     build:
       targets:
