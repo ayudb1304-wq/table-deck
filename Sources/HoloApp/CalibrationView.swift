@@ -119,6 +119,7 @@ struct CalibrationView: View {
                 }
 
                 ProgressView(value: session.progress)
+                    .accessibilityLabel("Calibration progress")
 
                 DeskMapView(
                     activeZone: nil,
@@ -151,6 +152,7 @@ struct CalibrationView: View {
                     Text(settlingMessage(for: session))
                         .font(.headline)
                 }
+                .accessibilityElement(children: .combine)
             } else if session.isArmed {
                 HStack(spacing: 8) {
                     Circle()
@@ -164,6 +166,7 @@ struct CalibrationView: View {
                             .foregroundStyle(.secondary)
                     }
                 }
+                .accessibilityElement(children: .combine)
             } else if let zone = session.currentZone {
                 Text("Move your hand to the \(zone.displayName.lowercased()) area. Holo ignores all sounds until you arm the zone.")
                     .font(.callout)
@@ -176,6 +179,9 @@ struct CalibrationView: View {
                 .controlSize(.large)
                 .disabled(!model.audio.isListening)
                 .help(model.audio.isListening ? "Start collecting this zone" : "Resume the microphone before arming")
+                .accessibilityHint(model.audio.isListening
+                    ? "Starts listening for taps in this zone."
+                    : "The microphone is paused. Resume it before arming.")
             }
 
             if let issue = model.guidedCaptureIssue {
@@ -183,6 +189,7 @@ struct CalibrationView: View {
                     .font(.callout)
                     .foregroundStyle(.orange)
                     .multilineTextAlignment(.center)
+                    .accessibilityLabel("Capture guidance: \(issue.guidance)")
             } else if let quality = model.audio.diagnostics.latestSignalQuality {
                 HStack(spacing: 18) {
                     Label(quality.summary, systemImage: quality.score > 0.48 ? "checkmark.circle" : "exclamationmark.circle")
@@ -191,6 +198,9 @@ struct CalibrationView: View {
                 }
                 .font(.caption)
                 .foregroundStyle(.secondary)
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel("Signal quality")
+                .accessibilityValue("\(quality.summary). \(String(format: "%.1f", quality.signalToNoiseDB)) decibels signal to noise.")
             }
 
             HStack {
@@ -281,11 +291,13 @@ struct CalibrationView: View {
                             Text("\(session.negativeCount(for: label)) captured")
                                 .font(.caption.monospacedDigit())
                                 .foregroundStyle(.secondary)
+                                .accessibilityLabel("\(session.negativeCount(for: label)) \(label) examples captured")
                             if session.negativeCount(for: label) > 0 {
                                 Button("Clear") {
                                     model.clearNegativeExamples(label: label)
                                 }
                                 .buttonStyle(.borderless)
+                                .accessibilityLabel("Clear \(label) examples")
                             }
                         }
                     }

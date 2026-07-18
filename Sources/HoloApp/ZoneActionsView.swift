@@ -138,6 +138,7 @@ private struct ZoneActionRow: View {
                 }
                 .labelsHidden()
                 .frame(width: 190)
+                .accessibilityLabel("Action for \(zoneDescription)")
 
                 detailControl
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -149,6 +150,7 @@ private struct ZoneActionRow: View {
                 .buttonStyle(.borderless)
                 .disabled(!canTest)
                 .help(canTest ? "Test this action" : "Finish configuring this action before testing")
+                .accessibilityLabel("Test action for \(zoneDescription)")
             }
         } label: {
             VStack(alignment: .leading, spacing: 1) {
@@ -177,6 +179,10 @@ private struct ZoneActionRow: View {
         LocalActionPlanner.command(for: action) != nil
     }
 
+    private var zoneDescription: String {
+        "\(configuration.zone.positionName), \(configuration.zone.isLeft ? "left" : "right") side"
+    }
+
     @ViewBuilder
     private var detailControl: some View {
         switch action.kind {
@@ -189,6 +195,7 @@ private struct ZoneActionRow: View {
             }
             .labelsHidden()
             .frame(maxWidth: 180)
+            .accessibilityLabel("Sound to play")
         case .copyText:
             TextField("Text to copy", text: $action.text)
         case .speakText:
