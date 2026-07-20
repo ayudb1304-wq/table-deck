@@ -86,6 +86,10 @@ struct EvaluationView: View {
                 }
 
                 ProgressView(value: session.progress)
+                    .accessibilityLabel("Evaluation progress")
+                    .accessibilityValue(
+                        "\(session.records.count) of \(DeskZone.allCases.count * session.targetPerZone) taps completed"
+                    )
 
                 DeskMapView(
                     activeZone: model.activeZone,
@@ -107,6 +111,7 @@ struct EvaluationView: View {
                             Text("Preparing the microphone…")
                                 .font(.headline)
                         }
+                        .accessibilityElement(children: .combine)
                     } else if session.isArmed {
                         HStack(spacing: 8) {
                             Circle()
@@ -121,6 +126,7 @@ struct EvaluationView: View {
                                     .foregroundStyle(.secondary)
                             }
                         }
+                        .accessibilityElement(children: .combine)
                     } else if let zone = session.currentZone {
                         Text("Move to \(zone.displayName.lowercased()). Sounds are ignored until you arm this zone.")
                             .font(.callout)
@@ -131,6 +137,9 @@ struct EvaluationView: View {
                             .controlSize(.large)
                             .disabled(!model.audio.isListening)
                             .help(model.audio.isListening ? "Start testing this zone" : "Resume the microphone before arming")
+                            .accessibilityHint(model.audio.isListening
+                                ? "Starts listening for evaluation taps in this zone."
+                                : "The microphone is paused. Resume it before arming.")
                     }
 
                     HStack(spacing: 20) {
@@ -218,6 +227,11 @@ struct EvaluationView: View {
                                         .foregroundStyle(.secondary)
                                 }
                             }
+                            .accessibilityElement(children: .ignore)
+                            .accessibilityLabel(item.zone.displayName)
+                            .accessibilityValue(
+                                "\(item.correct) of \(item.total) correct, \(Int(item.accuracy * 100)) percent"
+                            )
                         }
                     }
                     .font(.callout)
@@ -271,7 +285,21 @@ struct EvaluationView: View {
                     }
                 }
             }
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel("Confusion matrix")
+            .accessibilityValue(confusionMatrixAccessibilityValue(report))
         }
+    }
+
+    private func confusionMatrixAccessibilityValue(_ report: EvaluationReport) -> String {
+        DeskZone.allCases.map { expected in
+            let predictions = DeskZone.allCases.map { predicted in
+                "\(predicted.displayName) \(report.confusionMatrix[expected.rawValue][predicted.rawValue])"
+            }
+            let rejected = report.rejectedPerZone[expected.rawValue]
+            return "Expected \(expected.displayName): \(predictions.joined(separator: ", ")), rejected \(rejected)."
+        }
+        .joined(separator: " ")
     }
 
     private func acceptanceRow(_ label: String, _ value: String) -> some View {
