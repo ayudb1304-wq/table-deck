@@ -1,6 +1,15 @@
 # Holo
 
-Holo is an experimental native macOS utility that turns the desk immediately around a MacBook into four assignable tap zones. It listens through the selected Mac microphone, extracts acoustic features from short impulse windows, classifies the zone locally, and runs the action assigned to that zone.
+**Tap your desk. Your Mac responds.**
+
+[![CI](https://github.com/JustinGamer191/Holo/actions/workflows/ci.yml/badge.svg)](https://github.com/JustinGamer191/Holo/actions/workflows/ci.yml)
+
+[Landing page](https://justingamer191.github.io/Holo/) · [Download the latest release](https://github.com/JustinGamer191/Holo/releases/latest)
+
+<!--
+Future demo GIF placeholder: ![Holo demo](docs/holo-demo.gif)
+Tip: Record with macOS screen recording, then use ffmpeg's palettegen and paletteuse filters for a crisp, compact GIF.
+-->
 
 The topology is intentionally four broad zones:
 
