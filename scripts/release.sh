@@ -125,7 +125,9 @@ hdiutil create \
     "$dmg_path"
 
 log "Submitting the DMG for notarization"
-xcrun notarytool submit "$dmg_path" "${notary_arguments[@]}" --wait
+if ! xcrun notarytool submit "$dmg_path" "${notary_arguments[@]}" --wait; then
+    fail "notarization submission failed"
+fi
 
 log "Stapling and validating the notarization ticket"
 xcrun stapler staple "$dmg_path"
