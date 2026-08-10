@@ -14,13 +14,18 @@ public struct EvaluationRecord: Codable, Equatable, Sendable, Identifiable {
     public var responseLatencyMilliseconds: Double
     public var rejectionReason: RejectionReason?
     public var capturedAt: Date
+    /// Retained for deterministic offline rescoring. A nil value represents an
+    /// attempt that cannot be replayed, including detector misses and reports
+    /// saved before feature retention was introduced.
+    public var feature: TapFeatureVector?
 
     public init(
         id: UUID = UUID(),
         expectedZone: DeskZone,
         decision: ClassificationDecision,
         responseLatencyMilliseconds: Double,
-        capturedAt: Date = Date()
+        capturedAt: Date = Date(),
+        feature: TapFeatureVector? = nil
     ) {
         self.id = id
         self.expectedZone = expectedZone
@@ -29,6 +34,7 @@ public struct EvaluationRecord: Codable, Equatable, Sendable, Identifiable {
         self.responseLatencyMilliseconds = responseLatencyMilliseconds
         self.rejectionReason = decision.rejectionReason
         self.capturedAt = capturedAt
+        self.feature = feature
     }
 
     public var isCorrect: Bool { expectedZone == predictedZone }

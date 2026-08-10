@@ -75,6 +75,23 @@ DYLD_FRAMEWORK_PATH=/tmp/HoloRouteDerived/Build/Products/Debug \
   /tmp/HoloRouteDerived/Build/Products/Debug/HoloRouteCheck
 ```
 
+## Offline replay
+
+Retain evaluation feature vectors by running a new Accuracy Test in the app,
+then replay its saved JSON against a freshly trained classifier:
+
+```sh
+swift run HoloReplay \
+  --profile path/to/profile.json \
+  --evaluation path/to/evaluation.json
+```
+
+Add `--json` for machine-readable output. Reports created before feature
+retention show reduced coverage, and their missing attempts remain incorrect in
+the replay denominator. For future WAV replay investigations, enable **Retain
+90 ms debug recordings** before the Accuracy Test and preserve the entire
+`Holo/DebugCaptures` directory alongside the profile and evaluation JSON.
+
 ## Where things live
 
 - `Sources/HoloCore` — the detection engine: streaming detector, impact gate,
@@ -82,7 +99,8 @@ DYLD_FRAMEWORK_PATH=/tmp/HoloRouteDerived/Build/Products/Debug \
   evaluation reporting. No SwiftUI dependency. Covered by `Tests/HoloCoreTests`.
 - `Sources/HoloApp` — audio capture, app state, local action dispatch, and the
   SwiftUI interface.
-- `Sources/HoloSoak` and `Sources/HoloRouteCheck` — non-GUI verification tools.
+- `Sources/HoloSoak`, `Sources/HoloReplay`, and `Sources/HoloRouteCheck` —
+  non-GUI verification tools.
 
 ## Notes for pull requests
 

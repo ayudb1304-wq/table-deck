@@ -9,8 +9,10 @@
 /* Begin PBXBuildFile section */
 		00393C6A55E3BC29CE9658DE /* FeatureExtractorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC892138F3ABE811DD0C9B9E /* FeatureExtractorTests.swift */; };
 		05E854256BF905FC9837508B /* ActiveProbeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2314DF6CA5215BF112A083E /* ActiveProbeTests.swift */; };
+		075B0E602F2E3E9147D8B959 /* HoloReplaySupport.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = E6563A08AB6A3307AEDF48FF /* HoloReplaySupport.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		0F5D1CD5D1CCF1B11927B9BA /* Zone.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD429399EABE14BA1A5A84CF /* Zone.swift */; };
 		129303414A1AD286FDEC0D04 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = E112452DBE7F997A2D3F5A09 /* main.swift */; };
+		12B6347B4654073CF9E81AD2 /* HoloReplaySupport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E6563A08AB6A3307AEDF48FF /* HoloReplaySupport.framework */; };
 		1A5B70AEDD3783A053EC11BA /* GuidedNavigationGateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB7C209B453DD357A83213CF /* GuidedNavigationGateTests.swift */; };
 		1CF0B14F773C8DC088C1F50A /* ImpactEventGate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C50EC1749E3FB99D9FA73F60 /* ImpactEventGate.swift */; };
 		1F5E259A3212B2D56F4FDB43 /* LiveSurfaceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8276F53CD4BAD0E4134BE5E /* LiveSurfaceView.swift */; };
@@ -37,8 +39,12 @@
 		6762B5D73B06B4E99D776EDB /* Profile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FE34803263D649D4BCD0736 /* Profile.swift */; };
 		676E0C5E5F466D4800CC414A /* SignalModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 786309E60E647EA3FC80EFEC /* SignalModels.swift */; };
 		697AD776F5DB2666737B64BC /* AppSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21EF305DC4A12A1ABEF34C4B /* AppSection.swift */; };
+		6A69B260F44C5F2CFCD8BDF6 /* HoloCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1E426090AD292A90A8D04E8A /* HoloCore.framework */; };
+		6F5D483F7B9958C700D5E5D9 /* HoloReplay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51CDDA23A0C72CF81DAB2912 /* HoloReplay.swift */; };
 		70C2F5C3E9CE788F9FF340C6 /* PipelineIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BA724F536C59813B17CD8E1 /* PipelineIntegrationTests.swift */; };
+		735B4ECCB6E449428340CE2A /* HoloCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1E426090AD292A90A8D04E8A /* HoloCore.framework */; };
 		79678798269F9439CE050897 /* ZoneActionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20AD99C0A694BAFA5FCC3F1F /* ZoneActionsView.swift */; };
+		7D40131459A1B6D6044D681D /* ReplayScorerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C369F52879AC87672053C018 /* ReplayScorerTests.swift */; };
 		7F93A281C88E6615337DAAB1 /* HoloCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1E426090AD292A90A8D04E8A /* HoloCore.framework */; };
 		7FE08877939D9FE39661BE4D /* SystemAudioRoute.swift in Sources */ = {isa = PBXBuildFile; fileRef = A36F157ED33FCF6F689804F7 /* SystemAudioRoute.swift */; };
 		82952E46E4E37D1902510BF6 /* TapFeatureExtractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A3B1261978D3FB91C9EA104 /* TapFeatureExtractor.swift */; };
@@ -47,6 +53,7 @@
 		8D0E86BAA5C6386B544E3C8E /* AppIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 54769CB125997A9C3C965A64 /* AppIcon.icns */; };
 		91D45F930D4E8B87C24DE06F /* ActiveProbe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14EA5B348B95306264179465 /* ActiveProbe.swift */; };
 		954E32E4BA2EEBC3588330B5 /* HoloCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1E426090AD292A90A8D04E8A /* HoloCore.framework */; };
+		95D4B518E41888D09FE31F17 /* HoloCore.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 1E426090AD292A90A8D04E8A /* HoloCore.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		982737BAE8582ADB7DB0C1B6 /* ZoneTopologyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFBB34244A6DD0993CECF316 /* ZoneTopologyTests.swift */; };
 		9FD97FE7807945F49D11F6B3 /* AudioTimeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EEFBD981FF1B34ED6121E9F /* AudioTimeline.swift */; };
 		A2E94BAB65C2146F68694E7A /* HoloCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1E426090AD292A90A8D04E8A /* HoloCore.framework */; };
@@ -64,11 +71,14 @@
 		D616E3D2FAA03D4B719E60C3 /* SystemAudioRoute.swift in Sources */ = {isa = PBXBuildFile; fileRef = A36F157ED33FCF6F689804F7 /* SystemAudioRoute.swift */; };
 		D9B962FDD8C65B65A750C49D /* CalibrationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06C2F6E8443039D83D1F6B16 /* CalibrationView.swift */; };
 		DC41FD3CA77E2D96800F7774 /* HoloCore.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 1E426090AD292A90A8D04E8A /* HoloCore.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		E368F6F2A23146D98CED6C40 /* HoloCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1E426090AD292A90A8D04E8A /* HoloCore.framework */; };
 		E432550D743B42A4815F7843 /* LocalActionPlannerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E98E621F82CBBE59FD3A41C /* LocalActionPlannerTests.swift */; };
 		E8B9DECE1EEA7A6F9B90E876 /* HoloCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1E426090AD292A90A8D04E8A /* HoloCore.framework */; };
+		E8DADC33F304A03548BA5E5B /* ReplayScorer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17E39A438DFC8A1DF7F1E713 /* ReplayScorer.swift */; };
 		F129CE57FFD1555BB0DD06AA /* AudioTimelineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D35269A8759E31FCD6471E5E /* AudioTimelineTests.swift */; };
 		F2DFDBC7F1FFEA5FE7055058 /* HoloCore.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 1E426090AD292A90A8D04E8A /* HoloCore.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		F326055159A09A3291CEEE80 /* HoloCore.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 1E426090AD292A90A8D04E8A /* HoloCore.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		F6E3C79B45992746BEF435C0 /* HoloReplaySupport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E6563A08AB6A3307AEDF48FF /* HoloReplaySupport.framework */; };
 		F8CEDE2EDD114596B3B207F7 /* DeskMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9EA1642DC1B50D9B998D42 /* DeskMapView.swift */; };
 		FC9A309AC7E561E7421C4FBA /* ClassifierTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A905A97F45BFE70DF240318C /* ClassifierTests.swift */; };
 		FF12D620E6DF5A4DFABC3A5F /* EvaluationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B4A042398108C34F1A28654 /* EvaluationTests.swift */; };
@@ -81,6 +91,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 1F9C3C592CD8E0DBC05B2A8E;
 			remoteInfo = HoloCore;
+		};
+		1BF10783BDDA5A0F1573ABB9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C1F589EDC39988E4A67FC705 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B9D38D63D21C4C9ECA31E7D7;
+			remoteInfo = HoloReplaySupport;
 		};
 		309192E17484DDCB07145EC6 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -96,6 +113,13 @@
 			remoteGlobalIDString = 1F9C3C592CD8E0DBC05B2A8E;
 			remoteInfo = HoloCore;
 		};
+		5F975B3ED536A68943499102 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C1F589EDC39988E4A67FC705 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1F9C3C592CD8E0DBC05B2A8E;
+			remoteInfo = HoloCore;
+		};
 		7877770D44DB625A369C5FD8 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = C1F589EDC39988E4A67FC705 /* Project object */;
@@ -104,6 +128,27 @@
 			remoteInfo = HoloCore;
 		};
 		8BF745185A5A49EDE96D0273 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C1F589EDC39988E4A67FC705 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1F9C3C592CD8E0DBC05B2A8E;
+			remoteInfo = HoloCore;
+		};
+		8FB49DE640E8A93730BD38B1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C1F589EDC39988E4A67FC705 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B9D38D63D21C4C9ECA31E7D7;
+			remoteInfo = HoloReplaySupport;
+		};
+		BC30B1AE23B4A6E3AC942359 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C1F589EDC39988E4A67FC705 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1F9C3C592CD8E0DBC05B2A8E;
+			remoteInfo = HoloCore;
+		};
+		DDDC25688848D2013A73E796 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = C1F589EDC39988E4A67FC705 /* Project object */;
 			proxyType = 1;
@@ -135,6 +180,18 @@
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		8A33B092101809E17E0D38D4 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				075B0E602F2E3E9147D8B959 /* HoloReplaySupport.framework in Embed Frameworks */,
+				95D4B518E41888D09FE31F17 /* HoloCore.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E3601B2DC9870CEA09070562 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -150,13 +207,16 @@
 
 /* Begin PBXFileReference section */
 		05B0B1413010873D3FA1A528 /* Evaluation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Evaluation.swift; sourceTree = "<group>"; };
+		05C1A763C3CFBDE017A7E924 /* HoloReplay */ = {isa = PBXFileReference; includeInIndex = 0; path = HoloReplay; sourceTree = BUILT_PRODUCTS_DIR; };
 		06C2F6E8443039D83D1F6B16 /* CalibrationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalibrationView.swift; sourceTree = "<group>"; };
 		0861DC8B2455D59B07317D16 /* GuidedCaptureQualityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuidedCaptureQualityTests.swift; sourceTree = "<group>"; };
+		08CFE74A14E46B29AF16C120 /* HoloReplayTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HoloReplayTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		0BA724F536C59813B17CD8E1 /* PipelineIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PipelineIntegrationTests.swift; sourceTree = "<group>"; };
 		1233A1C534AEBF2462E3665F /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		138781D29C8F493B4BEBF347 /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
 		14EA5B348B95306264179465 /* ActiveProbe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveProbe.swift; sourceTree = "<group>"; };
 		1637550E7F75A6E7BFCE8862 /* AudioHardwarePolicyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioHardwarePolicyTests.swift; sourceTree = "<group>"; };
+		17E39A438DFC8A1DF7F1E713 /* ReplayScorer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReplayScorer.swift; sourceTree = "<group>"; };
 		18F542BE59EBC93B85BBB829 /* Diagnostics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diagnostics.swift; sourceTree = "<group>"; };
 		1A3B1261978D3FB91C9EA104 /* TapFeatureExtractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TapFeatureExtractor.swift; sourceTree = "<group>"; };
 		1E426090AD292A90A8D04E8A /* HoloCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = HoloCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -171,6 +231,7 @@
 		4B9EA1642DC1B50D9B998D42 /* DeskMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeskMapView.swift; sourceTree = "<group>"; };
 		4E98E621F82CBBE59FD3A41C /* LocalActionPlannerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalActionPlannerTests.swift; sourceTree = "<group>"; };
 		50AC2C28BEB4F4997E61E917 /* AsyncBooleanRequestGateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AsyncBooleanRequestGateTests.swift; sourceTree = "<group>"; };
+		51CDDA23A0C72CF81DAB2912 /* HoloReplay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HoloReplay.swift; sourceTree = "<group>"; };
 		54769CB125997A9C3C965A64 /* AppIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = AppIcon.icns; sourceTree = "<group>"; };
 		5D9A4872F0AF435869BAE285 /* AudioHardwarePolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioHardwarePolicy.swift; sourceTree = "<group>"; };
 		634844CB07B4E483B2423FEB /* AudioCaptureService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioCaptureService.swift; sourceTree = "<group>"; };
@@ -191,6 +252,7 @@
 		AC4C35B1645CC2E3DB378982 /* HoloAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HoloAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B8276F53CD4BAD0E4134BE5E /* LiveSurfaceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveSurfaceView.swift; sourceTree = "<group>"; };
 		C1C797ED25B4E0F506DC4F10 /* FFT.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FFT.swift; sourceTree = "<group>"; };
+		C369F52879AC87672053C018 /* ReplayScorerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReplayScorerTests.swift; sourceTree = "<group>"; };
 		C50EC1749E3FB99D9FA73F60 /* ImpactEventGate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImpactEventGate.swift; sourceTree = "<group>"; };
 		C8E20401C40556F494F3A724 /* SensingStrategyResolverTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensingStrategyResolverTests.swift; sourceTree = "<group>"; };
 		D2314DF6CA5215BF112A083E /* ActiveProbeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveProbeTests.swift; sourceTree = "<group>"; };
@@ -202,6 +264,7 @@
 		E112452DBE7F997A2D3F5A09 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		E16C01A483EE0B2355493E69 /* GuidedSessionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuidedSessionTests.swift; sourceTree = "<group>"; };
 		E3398CF16BF083A03B5897A9 /* EvaluationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EvaluationView.swift; sourceTree = "<group>"; };
+		E6563A08AB6A3307AEDF48FF /* HoloReplaySupport.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = HoloReplaySupport.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E97704CED99344632D2F7E3C /* WaveFileWriter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaveFileWriter.swift; sourceTree = "<group>"; };
 		EB7C209B453DD357A83213CF /* GuidedNavigationGateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuidedNavigationGateTests.swift; sourceTree = "<group>"; };
 		ED798B1FD296DDD1C10BEB25 /* LocalActionPlanning.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalActionPlanning.swift; sourceTree = "<group>"; };
@@ -219,11 +282,37 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		3ED3C76E1CA2317C51B237E1 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F6E3C79B45992746BEF435C0 /* HoloReplaySupport.framework in Frameworks */,
+				735B4ECCB6E449428340CE2A /* HoloCore.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		43FE42C523952CE331982C05 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6A69B260F44C5F2CFCD8BDF6 /* HoloCore.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		57C6E37693559FF7BE3DD216 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				E8B9DECE1EEA7A6F9B90E876 /* HoloCore.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6CBAD51769356D113FAE3361 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E368F6F2A23146D98CED6C40 /* HoloCore.framework in Frameworks */,
+				12B6347B4654073CF9E81AD2 /* HoloReplaySupport.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -262,6 +351,14 @@
 			path = Config;
 			sourceTree = "<group>";
 		};
+		3FB2D95F1333DCF0283DC78E /* HoloReplaySupport */ = {
+			isa = PBXGroup;
+			children = (
+				17E39A438DFC8A1DF7F1E713 /* ReplayScorer.swift */,
+			);
+			path = HoloReplaySupport;
+			sourceTree = "<group>";
+		};
 		5DC994B8D19F9E93AC9C9A33 /* HoloCoreTests */ = {
 			isa = PBXGroup;
 			children = (
@@ -298,8 +395,17 @@
 			children = (
 				BEBFF382981D2C7A383D320E /* HoloAppTests */,
 				5DC994B8D19F9E93AC9C9A33 /* HoloCoreTests */,
+				78D917A9A5E8513BE0EDB021 /* HoloReplayTests */,
 			);
 			path = Tests;
+			sourceTree = "<group>";
+		};
+		78D917A9A5E8513BE0EDB021 /* HoloReplayTests */ = {
+			isa = PBXGroup;
+			children = (
+				C369F52879AC87672053C018 /* ReplayScorerTests.swift */,
+			);
+			path = HoloReplayTests;
 			sourceTree = "<group>";
 		};
 		80BB791C3B72F97219390648 /* HoloRouteCheck */ = {
@@ -308,6 +414,14 @@
 				1233A1C534AEBF2462E3665F /* main.swift */,
 			);
 			path = HoloRouteCheck;
+			sourceTree = "<group>";
+		};
+		8265EDE4E987E067336BC290 /* HoloReplay */ = {
+			isa = PBXGroup;
+			children = (
+				51CDDA23A0C72CF81DAB2912 /* HoloReplay.swift */,
+			);
+			path = HoloReplay;
 			sourceTree = "<group>";
 		};
 		8E7EAA6E02D23D2051F6162E /* HoloCore */ = {
@@ -342,6 +456,9 @@
 				AC4C35B1645CC2E3DB378982 /* HoloAppTests.xctest */,
 				1E426090AD292A90A8D04E8A /* HoloCore.framework */,
 				9F71702ABD6F816E14DCE97F /* HoloCoreTests.xctest */,
+				05C1A763C3CFBDE017A7E924 /* HoloReplay */,
+				E6563A08AB6A3307AEDF48FF /* HoloReplaySupport.framework */,
+				08CFE74A14E46B29AF16C120 /* HoloReplayTests.xctest */,
 				2962986A4A520497F2F80CFD /* HoloRouteCheck */,
 				204609B415E7B88FBF1C7CB4 /* HoloSoak */,
 			);
@@ -353,6 +470,8 @@
 			children = (
 				DB4788D7F1CC25C70D29BF74 /* HoloApp */,
 				8E7EAA6E02D23D2051F6162E /* HoloCore */,
+				8265EDE4E987E067336BC290 /* HoloReplay */,
+				3FB2D95F1333DCF0283DC78E /* HoloReplaySupport */,
 				80BB791C3B72F97219390648 /* HoloRouteCheck */,
 				DF0BF61A11F8D3E4F47C6E9A /* HoloSoak */,
 			);
@@ -457,6 +576,26 @@
 			productReference = 2962986A4A520497F2F80CFD /* HoloRouteCheck */;
 			productType = "com.apple.product-type.tool";
 		};
+		88F0985131DDF5B7524F984A /* HoloReplay */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 74D5870BEE17CB26F99EBBF5 /* Build configuration list for PBXNativeTarget "HoloReplay" */;
+			buildPhases = (
+				49766169A8E55A4255B05B4C /* Sources */,
+				6CBAD51769356D113FAE3361 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				1F73F79A80045BDCE947C987 /* PBXTargetDependency */,
+				13F75B2410E6BFB83DF4446B /* PBXTargetDependency */,
+			);
+			name = HoloReplay;
+			packageProductDependencies = (
+			);
+			productName = HoloReplay;
+			productReference = 05C1A763C3CFBDE017A7E924 /* HoloReplay */;
+			productType = "com.apple.product-type.tool";
+		};
 		9A0864AD575062AF8919E457 /* Holo */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = AE7BB94F09CC0DE10A65D3F5 /* Build configuration list for PBXNativeTarget "Holo" */;
@@ -497,6 +636,46 @@
 			productName = HoloAppTests;
 			productReference = AC4C35B1645CC2E3DB378982 /* HoloAppTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		AE7456AB0A1CAE6A83B30EF7 /* HoloReplayTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6DD79699A5A38D6E6412C68C /* Build configuration list for PBXNativeTarget "HoloReplayTests" */;
+			buildPhases = (
+				777A101C5ECD9E4FD0FD9DF1 /* Sources */,
+				3ED3C76E1CA2317C51B237E1 /* Frameworks */,
+				8A33B092101809E17E0D38D4 /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				2E1A2CCE89538DA08BDF950C /* PBXTargetDependency */,
+				A0EE07D2A87A78B3DCF4CB36 /* PBXTargetDependency */,
+			);
+			name = HoloReplayTests;
+			packageProductDependencies = (
+			);
+			productName = HoloReplayTests;
+			productReference = 08CFE74A14E46B29AF16C120 /* HoloReplayTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		B9D38D63D21C4C9ECA31E7D7 /* HoloReplaySupport */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D6A91C3E171EE8CC7251DFAF /* Build configuration list for PBXNativeTarget "HoloReplaySupport" */;
+			buildPhases = (
+				FA32C85B1B2F1B4EB2247122 /* Sources */,
+				43FE42C523952CE331982C05 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				B9608879B16EEAE544C1BC82 /* PBXTargetDependency */,
+			);
+			name = HoloReplaySupport;
+			packageProductDependencies = (
+			);
+			productName = HoloReplaySupport;
+			productReference = E6563A08AB6A3307AEDF48FF /* HoloReplaySupport.framework */;
+			productType = "com.apple.product-type.framework";
 		};
 		F9C864127BCDDE6703522B72 /* HoloCoreTests */ = {
 			isa = PBXNativeTarget;
@@ -551,6 +730,9 @@
 				9F16F8CF8BEC21D76AE06244 /* HoloAppTests */,
 				1F9C3C592CD8E0DBC05B2A8E /* HoloCore */,
 				F9C864127BCDDE6703522B72 /* HoloCoreTests */,
+				88F0985131DDF5B7524F984A /* HoloReplay */,
+				B9D38D63D21C4C9ECA31E7D7 /* HoloReplaySupport */,
+				AE7456AB0A1CAE6A83B30EF7 /* HoloReplayTests */,
 				2A0913028CBDE5ED39D59063 /* HoloRouteCheck */,
 				05EF2198DDEBF8D87DCECB3C /* HoloSoak */,
 			);
@@ -578,6 +760,14 @@
 				1A5B70AEDD3783A053EC11BA /* GuidedNavigationGateTests.swift in Sources */,
 				287488E02E5FB074A6E6CB7E /* SensingStrategyResolver.swift in Sources */,
 				3DE431E01C84510F04899D9E /* SensingStrategyResolverTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		49766169A8E55A4255B05B4C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6F5D483F7B9958C700D5E5D9 /* HoloReplay.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -610,6 +800,14 @@
 			files = (
 				7FE08877939D9FE39661BE4D /* SystemAudioRoute.swift in Sources */,
 				BDDF5DCFFE9F17B02F91E911 /* main.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		777A101C5ECD9E4FD0FD9DF1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7D40131459A1B6D6044D681D /* ReplayScorerTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -667,13 +865,36 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		FA32C85B1B2F1B4EB2247122 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E8DADC33F304A03548BA5E5B /* ReplayScorer.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		13F75B2410E6BFB83DF4446B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B9D38D63D21C4C9ECA31E7D7 /* HoloReplaySupport */;
+			targetProxy = 8FB49DE640E8A93730BD38B1 /* PBXContainerItemProxy */;
+		};
+		1F73F79A80045BDCE947C987 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1F9C3C592CD8E0DBC05B2A8E /* HoloCore */;
+			targetProxy = 5F975B3ED536A68943499102 /* PBXContainerItemProxy */;
+		};
 		2D02481EB3244971151F785D /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 1F9C3C592CD8E0DBC05B2A8E /* HoloCore */;
 			targetProxy = 5F5F9058A4159E431D5ECB52 /* PBXContainerItemProxy */;
+		};
+		2E1A2CCE89538DA08BDF950C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B9D38D63D21C4C9ECA31E7D7 /* HoloReplaySupport */;
+			targetProxy = 1BF10783BDDA5A0F1573ABB9 /* PBXContainerItemProxy */;
 		};
 		85F9AA22B51D46F5ED32E558 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -684,6 +905,16 @@
 			isa = PBXTargetDependency;
 			target = 1F9C3C592CD8E0DBC05B2A8E /* HoloCore */;
 			targetProxy = 1A7BB2A94839D75FBDC86964 /* PBXContainerItemProxy */;
+		};
+		A0EE07D2A87A78B3DCF4CB36 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1F9C3C592CD8E0DBC05B2A8E /* HoloCore */;
+			targetProxy = BC30B1AE23B4A6E3AC942359 /* PBXContainerItemProxy */;
+		};
+		B9608879B16EEAE544C1BC82 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1F9C3C592CD8E0DBC05B2A8E /* HoloCore */;
+			targetProxy = DDDC25688848D2013A73E796 /* PBXContainerItemProxy */;
 		};
 		D0CC9A719D00757979F5A83F /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -730,6 +961,61 @@
 			};
 			name = Debug;
 		};
+		50F18380EAC3BCF7DD68A150 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.holo.HoloReplayTests;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		52A9BFC22EE8FF177C2AFF8F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GENERATE_INFOPLIST_FILE = YES;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.holo.HoloReplaySupport;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+			};
+			name = Release;
+		};
+		56EFB4BD500D5EB218A68BBC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.holo.HoloReplayTests;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
 		5FA1C0C545AE847DAF02E83C /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -768,6 +1054,20 @@
 			};
 			name = Release;
 		};
+		6883D4B2D092BCC22853C04F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.holo.HoloReplay;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
 		6E4AE92987B3C5CFAD6A6EFE /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -788,6 +1088,43 @@
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
 				VERSIONING_SYSTEM = "apple-generic";
+			};
+			name = Debug;
+		};
+		749475B53BE5E28190CB6A40 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GENERATE_INFOPLIST_FILE = YES;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.holo.HoloReplaySupport;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+			};
+			name = Debug;
+		};
+		7A6C4F58AD32D53F836D2468 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.holo.HoloReplay;
+				SDKROOT = macosx;
 			};
 			name = Debug;
 		};
@@ -1063,6 +1400,24 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
+		6DD79699A5A38D6E6412C68C /* Build configuration list for PBXNativeTarget "HoloReplayTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				56EFB4BD500D5EB218A68BBC /* Debug */,
+				50F18380EAC3BCF7DD68A150 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		74D5870BEE17CB26F99EBBF5 /* Build configuration list for PBXNativeTarget "HoloReplay" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7A6C4F58AD32D53F836D2468 /* Debug */,
+				6883D4B2D092BCC22853C04F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
 		A7E7B78EEC553986A7081A65 /* Build configuration list for PBXNativeTarget "HoloCore" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -1095,6 +1450,15 @@
 			buildConfigurations = (
 				81EC9D8E66DADF32E64312A6 /* Debug */,
 				E337921D6F848ABDC9A28466 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		D6A91C3E171EE8CC7251DFAF /* Build configuration list for PBXNativeTarget "HoloReplaySupport" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				749475B53BE5E28190CB6A40 /* Debug */,
+				52A9BFC22EE8FF177C2AFF8F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
