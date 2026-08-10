@@ -222,8 +222,7 @@
 
     .section-heading h2,
     .privacy h2,
-    .evaluation h2,
-    .faq h2,
+    .notes h2,
     .demo-placeholder h2 {
       margin: 0;
       font-size: clamp(36px, 5vw, 56px);
@@ -264,7 +263,10 @@
     .steps {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
+      margin: 0;
+      padding: 0;
       border-top: 1px solid var(--line-strong);
+      list-style: none;
     }
 
     .step {
@@ -284,16 +286,15 @@
       font-variant-numeric: tabular-nums;
     }
 
-    .step h3 {
-      margin: 0 0 12px;
-      font-size: 28px;
-      font-weight: 620;
-      letter-spacing: -0.025em;
-    }
-
     .step p {
       margin: 0;
       color: var(--secondary);
+      font-size: 20px;
+    }
+
+    .step strong {
+      color: var(--text);
+      font-weight: 620;
     }
 
     .demo-placeholder {
@@ -322,109 +323,31 @@
       gap: 64px;
     }
 
-    .privacy-copy > p {
-      max-width: 630px;
-      margin: 4px 0 42px;
-      color: var(--secondary);
-      font-size: clamp(20px, 2.5vw, 28px);
-      line-height: 1.35;
-    }
-
-    .privacy-list {
+    .privacy-points,
+    .notes-list {
       margin: 0;
+      padding: 0;
+      border-top: 1px solid var(--line-strong);
+      list-style: none;
     }
 
-    .privacy-list div {
-      display: grid;
-      grid-template-columns: 150px 1fr;
-      gap: 24px;
+    .privacy-points li,
+    .notes-list li {
       padding: 22px 0;
-      border-top: 1px solid var(--line);
-    }
-
-    .privacy-list div:last-child {
       border-bottom: 1px solid var(--line);
-    }
-
-    .privacy-list dt {
-      font-weight: 620;
-    }
-
-    .privacy-list dd {
-      margin: 0;
       color: var(--secondary);
+      font-size: 20px;
     }
 
-    .evaluation {
-      display: grid;
-      grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
-      gap: 64px;
-      align-items: start;
-    }
-
-    .evaluation-note {
-      padding: 34px 0;
-      border-block: 1px solid var(--line-strong);
-    }
-
-    .evaluation-note p {
-      margin: 0;
-      color: var(--secondary);
-      font-size: clamp(20px, 2.5vw, 28px);
-      line-height: 1.4;
-    }
-
-    .evaluation-note strong {
+    .privacy-points strong {
       color: var(--text);
       font-weight: 620;
     }
 
-    .faq {
+    .notes {
       display: grid;
-      grid-template-columns: minmax(0, 0.55fr) minmax(0, 1.45fr);
+      grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
       gap: 64px;
-    }
-
-    .faq-list {
-      border-top: 1px solid var(--line-strong);
-    }
-
-    details {
-      border-bottom: 1px solid var(--line);
-    }
-
-    summary {
-      position: relative;
-      padding: 26px 44px 26px 0;
-      cursor: pointer;
-      font-size: 20px;
-      font-weight: 590;
-      list-style: none;
-    }
-
-    summary::-webkit-details-marker {
-      display: none;
-    }
-
-    summary::after {
-      position: absolute;
-      top: 25px;
-      right: 4px;
-      color: var(--tertiary);
-      content: "+";
-      font-size: 24px;
-      font-weight: 400;
-      line-height: 1;
-    }
-
-    details[open] summary::after {
-      content: "−";
-    }
-
-    details p {
-      max-width: 690px;
-      margin: -4px 44px 26px 0;
-      color: var(--secondary);
     }
 
     footer {
@@ -494,8 +417,7 @@
 
       .section-heading,
       .privacy,
-      .evaluation,
-      .faq {
+      .notes {
         grid-template-columns: 1fr;
         gap: 32px;
       }
@@ -532,19 +454,6 @@
 
       .video-placeholder {
         aspect-ratio: 9 / 12;
-      }
-
-      .privacy-copy > p {
-        margin-bottom: 28px;
-      }
-
-      .privacy-list div {
-        grid-template-columns: 1fr;
-        gap: 4px;
-      }
-
-      .evaluation-note {
-        padding-block: 26px;
       }
 
       footer {
@@ -588,7 +497,7 @@
     <section class="zones" aria-labelledby="zones-title">
       <div class="section-heading">
         <h2 id="zones-title">Four zones.<br>Your actions.</h2>
-        <p>Holo listens for the acoustic signature of a tap and identifies which broad area around your MacBook it came from.</p>
+        <p>Left. Right. Front. Rear.</p>
       </div>
 
       <figure class="zone-figure">
@@ -625,32 +534,28 @@
             <text x="480" y="495" text-anchor="middle">TRACKPAD SIDE</text>
           </g>
         </svg>
-        <figcaption>Assign each zone a sound, text, website, Shortcut, app, file, shell command, or screenshot action.</figcaption>
+        <figcaption>One action per zone.</figcaption>
       </figure>
     </section>
 
     <section id="how-it-works" aria-labelledby="how-title">
       <div class="section-heading">
         <h2 id="how-title">How it works</h2>
-        <p>One guided setup teaches Holo how taps sound on your MacBook and desk.</p>
       </div>
-      <div class="steps">
-        <article class="step">
+      <ol class="steps">
+        <li class="step">
           <span class="step-number">01</span>
-          <h3>Calibrate</h3>
-          <p>Tap each zone ten times. Holo learns the acoustic character of your exact setup.</p>
-        </article>
-        <article class="step">
+          <p><strong>Calibrate.</strong> Tap each zone ten times.</p>
+        </li>
+        <li class="step">
           <span class="step-number">02</span>
-          <h3>Assign</h3>
-          <p>Choose one local action for each zone—from opening a file to running a Shortcut.</p>
-        </article>
-        <article class="step">
+          <p><strong>Assign.</strong> Pick one action per zone.</p>
+        </li>
+        <li class="step">
           <span class="step-number">03</span>
-          <h3>Tap</h3>
-          <p>Return to your desk and tap. Accepted taps trigger the action you chose.</p>
-        </article>
-      </div>
+          <p><strong>Tap.</strong> Your Mac runs it.</p>
+        </li>
+      </ol>
     </section>
 
     <section id="demo" class="demo-placeholder" aria-labelledby="demo-title">
@@ -667,53 +572,21 @@
     </section>
 
     <section class="privacy" aria-labelledby="privacy-title">
-      <h2 id="privacy-title">Your desk stays<br>your business.</h2>
-      <div class="privacy-copy">
-        <p>Holo processes taps on your Mac. It does not upload audio, features, profiles, or evaluation reports.</p>
-        <dl class="privacy-list">
-          <div>
-            <dt>Local-only</dt>
-            <dd>Detection, feature extraction, classification, and profile storage happen on your Mac.</dd>
-          </div>
-          <div>
-            <dt>Sandboxed</dt>
-            <dd>Holo runs inside the standard macOS app sandbox.</dd>
-          </div>
-          <div>
-            <dt>Discarded</dt>
-            <dd>Raw audio windows are discarded after feature extraction by default. Debug recording is opt-in.</dd>
-          </div>
-        </dl>
-      </div>
+      <h2 id="privacy-title">Private by default.</h2>
+      <ul class="privacy-points">
+        <li><strong>Local.</strong> Tap processing stays on your Mac.</li>
+        <li><strong>Sandboxed.</strong> No audio or profiles are uploaded.</li>
+        <li><strong>Discarded.</strong> Raw audio is discarded by default.</li>
+      </ul>
     </section>
 
-    <section class="evaluation" aria-labelledby="evaluation-title">
-      <h2 id="evaluation-title">Measure your setup,<br>not a promise.</h2>
-      <div class="evaluation-note">
-        <p><strong>Accuracy depends on the MacBook, desk, room, and laptop position.</strong> Every setup runs its own guided 60-tap evaluation, with results saved to that desk profile.</p>
-      </div>
-    </section>
-
-    <section class="faq" aria-labelledby="faq-title">
-      <h2 id="faq-title">FAQ</h2>
-      <div class="faq-list">
-        <details>
-          <summary>What can a tap do?</summary>
-          <p>Play a sound, copy or speak text, open a website, run a Shortcut, open an app, file, or folder, execute a shell command, or take a screenshot.</p>
-        </details>
-        <details>
-          <summary>Does Holo work on every desk?</summary>
-          <p>No universal accuracy claim is made. Stable, rigid surfaces are the best candidates, and moving the MacBook changes the acoustic path. Use Holo’s 60-tap evaluation to measure your setup.</p>
-        </details>
-        <details>
-          <summary>Does it record me?</summary>
-          <p>Raw audio is held only long enough to analyze a short tap window, then discarded by default. Optional debug recordings must be enabled explicitly and stay local.</p>
-        </details>
-        <details>
-          <summary>What does Holo require?</summary>
-          <p>macOS 14 or later on a MacBook, using its built-in microphone. Holo is functional experimental software, so expect to calibrate and test it on your own desk.</p>
-        </details>
-      </div>
+    <section class="notes" aria-labelledby="notes-title">
+      <h2 id="notes-title">Good to know.</h2>
+      <ul class="notes-list">
+        <li>Calibrate and run the 60-tap test on your own desk.</li>
+        <li>Accuracy changes with the desk, room, and laptop position.</li>
+        <li>Requires macOS 14+ and a MacBook’s built-in microphone.</li>
+      </ul>
     </section>
   </main>
 
