@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="mesh" x1="10" y1="12" x2="54" y2="52" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2997ff"/>
+      <stop offset="1" stop-color="#35dfc5"/>
+    </linearGradient>
+    <radialGradient id="core" cx="0" cy="0" r="1" gradientTransform="translate(25 20) rotate(48) scale(45)">
+      <stop stop-color="#123451" stop-opacity=".94"/>
+      <stop offset="1" stop-color="#061018" stop-opacity=".88"/>
+    </radialGradient>
+    <clipPath id="orb-clip">
+      <path d="M32 5c12-1 22 8 26 19 4 12-2 25-12 32-10 7-24 4-33-5C5 43 5 30 10 20 15 10 23 7 32 5Z"/>
+    </clipPath>
+    <filter id="glow" x="-25%" y="-25%" width="150%" height="150%">
+      <feGaussianBlur stdDeviation="1.2" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <path d="M32 5c12-1 22 8 26 19 4 12-2 25-12 32-10 7-24 4-33-5C5 43 5 30 10 20 15 10 23 7 32 5Z" fill="url(#core)"/>
+  <g clip-path="url(#orb-clip)" fill="none" stroke="url(#mesh)" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)">
+    <path d="M8 23c13-5 35-4 50 3" stroke-width="2"/>
+    <path d="M6 35c14-5 37-4 53 2" stroke-width="2.2"/>
+    <path d="M10 47c13-3 27-2 40 4" stroke-width="2"/>
+    <path d="M29 5c-10 14-11 37 0 53" stroke-width="2"/>
+    <path d="M39 6c10 15 8 38-4 52" stroke-width="2"/>
+    <path d="M32 5c12-1 22 8 26 19 4 12-2 25-12 32-10 7-24 4-33-5C5 43 5 30 10 20 15 10 23 7 32 5Z" stroke-width="2.6"/>
+  </g>
+</svg>
