@@ -258,3 +258,7 @@ For every supported Mac/desk combination:
 5. Run the live app for 30 minutes with representative taps, conversation, typing, laptop touches, and background noise while monitoring crashes, false triggers, and memory.
 
 Until those physical checks are complete, Holo should be described as functional experimental software—not a proven acoustic input device.
+
+## License
+
+Holo is available under the [MIT License](LICENSE).
