@@ -50,6 +50,7 @@
 		82952E46E4E37D1902510BF6 /* TapFeatureExtractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A3B1261978D3FB91C9EA104 /* TapFeatureExtractor.swift */; };
 		8312B2EACF8033110C5296B9 /* GuidedCaptureQuality.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79925025DC399059AC395026 /* GuidedCaptureQuality.swift */; };
 		84C3E7F91F74234D68B9117A /* AppSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21EF305DC4A12A1ABEF34C4B /* AppSection.swift */; };
+		8D0E86BAA5C6386B544E3C8E /* AppIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 54769CB125997A9C3C965A64 /* AppIcon.icns */; };
 		91D45F930D4E8B87C24DE06F /* ActiveProbe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14EA5B348B95306264179465 /* ActiveProbe.swift */; };
 		954E32E4BA2EEBC3588330B5 /* HoloCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1E426090AD292A90A8D04E8A /* HoloCore.framework */; };
 		95D4B518E41888D09FE31F17 /* HoloCore.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 1E426090AD292A90A8D04E8A /* HoloCore.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -231,6 +232,7 @@
 		4E98E621F82CBBE59FD3A41C /* LocalActionPlannerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalActionPlannerTests.swift; sourceTree = "<group>"; };
 		50AC2C28BEB4F4997E61E917 /* AsyncBooleanRequestGateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AsyncBooleanRequestGateTests.swift; sourceTree = "<group>"; };
 		51CDDA23A0C72CF81DAB2912 /* HoloReplay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HoloReplay.swift; sourceTree = "<group>"; };
+		54769CB125997A9C3C965A64 /* AppIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = AppIcon.icns; sourceTree = "<group>"; };
 		5D9A4872F0AF435869BAE285 /* AudioHardwarePolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioHardwarePolicy.swift; sourceTree = "<group>"; };
 		634844CB07B4E483B2423FEB /* AudioCaptureService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioCaptureService.swift; sourceTree = "<group>"; };
 		69E4D6C427B2356EFA9861AD /* GuidedSessions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuidedSessions.swift; sourceTree = "<group>"; };
@@ -341,6 +343,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		29FD5701AFD4D354C5B9BD85 /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				54769CB125997A9C3C965A64 /* AppIcon.icns */,
+			);
+			path = Config;
+			sourceTree = "<group>";
+		};
 		3FB2D95F1333DCF0283DC78E /* HoloReplaySupport */ = {
 			isa = PBXGroup;
 			children = (
@@ -373,6 +383,7 @@
 		62F9C7F3DED4DD60C3DC23FD = {
 			isa = PBXGroup;
 			children = (
+				29FD5701AFD4D354C5B9BD85 /* Config */,
 				BE09DB2D69F2F9FB8E23BF2E /* Sources */,
 				711DF01B13EFBF24410BCD0A /* Tests */,
 				96959561F12B456F3AEE3CD6 /* Products */,
@@ -590,6 +601,7 @@
 			buildConfigurationList = AE7BB94F09CC0DE10A65D3F5 /* Build configuration list for PBXNativeTarget "Holo" */;
 			buildPhases = (
 				526638B757E6B22CE4A766D6 /* Sources */,
+				7B50280715400526ABA89696 /* Resources */,
 				E0BA8B99092B27F3E7081993 /* Frameworks */,
 				E3601B2DC9870CEA09070562 /* Embed Frameworks */,
 			);
@@ -726,6 +738,17 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		7B50280715400526ABA89696 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8D0E86BAA5C6386B544E3C8E /* AppIcon.icns in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		26E74F0565BCB3981B971F4C /* Sources */ = {

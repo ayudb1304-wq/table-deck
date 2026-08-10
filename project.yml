@@ -28,10 +28,13 @@ targets:
     platform: macOS
     sources:
       - path: Sources/HoloApp
+      - path: Config/AppIcon.icns
+        buildPhase: resources
     info:
       path: Config/Holo-Info.plist
       properties:
         CFBundleDisplayName: Holo
+        CFBundleIconFile: AppIcon
         CFBundleName: Holo
         CFBundleShortVersionString: $(MARKETING_VERSION)
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)

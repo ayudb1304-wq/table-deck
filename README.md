@@ -1,6 +1,17 @@
 # Holo
 
-Holo is an experimental native macOS utility that turns the desk immediately around a MacBook into four assignable tap zones. It listens through the selected Mac microphone, extracts acoustic features from short impulse windows, classifies the zone locally, and runs the action assigned to that zone.
+**Tap your desk. Your Mac responds.**
+
+[![CI](https://github.com/JustinGamer191/Holo/actions/workflows/ci.yml/badge.svg)](https://github.com/JustinGamer191/Holo/actions/workflows/ci.yml)
+
+[Landing page](https://justingamer191.github.io/Holo/) · [Download the latest release](https://github.com/JustinGamer191/Holo/releases/latest)
+
+<!--
+Future demo GIF placeholder: ![Holo demo](docs/holo-demo.gif)
+Tip: Record with macOS screen recording, then use ffmpeg's palettegen and paletteuse filters for a crisp, compact GIF.
+-->
+
+Holo is an experimental native macOS utility that turns the desk immediately around a MacBook into four assignable tap zones. It listens through the Mac's microphone, classifies each tap locally, and runs the action assigned to that zone.
 
 The topology is intentionally four broad zones:
 
@@ -15,6 +26,8 @@ Left Front     └─────────────┘      Right Front
 Holo is a research prototype. Automated DSP tests pass, but useful accuracy still has to be measured on each real MacBook, desk, room, and laptop position. No physical accuracy claim is made without a saved 60-tap evaluation from that setup.
 
 The requirement-by-requirement evidence ledger is in [ACCEPTANCE.md](ACCEPTANCE.md).
+
+The recovered physical baseline, failure analysis, and controlled iteration protocol are in [ACCURACY.md](ACCURACY.md).
 
 ## What is implemented
 
@@ -258,3 +271,7 @@ For every supported Mac/desk combination:
 5. Run the live app for 30 minutes with representative taps, conversation, typing, laptop touches, and background noise while monitoring crashes, false triggers, and memory.
 
 Until those physical checks are complete, Holo should be described as functional experimental software—not a proven acoustic input device.
+
+## License
+
+Holo is available under the [MIT License](LICENSE).
