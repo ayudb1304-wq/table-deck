@@ -2,8 +2,9 @@
 .build/
 build/
 DerivedData/
+.derived/
+dist/
 *.xcuserstate
 xcuserdata/
 Holo.xcodeproj/project.xcworkspace/xcuserdata/
 Holo.xcodeproj/xcuserdata/
-
