@@ -112,7 +112,6 @@
       min-height: 72px;
       align-items: center;
       justify-content: space-between;
-      border-bottom: 1px solid var(--line);
     }
 
     .wordmark {
@@ -142,6 +141,10 @@
     section {
       padding-block: 112px;
       border-bottom: 1px solid var(--line);
+    }
+
+    main section:last-child {
+      border-bottom: 0;
     }
 
     .hero {
@@ -298,43 +301,6 @@
       text-align: center;
     }
 
-    .steps {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      margin: 0;
-      padding: 0;
-      border-top: 1px solid var(--line-strong);
-      list-style: none;
-    }
-
-    .step {
-      padding: 34px 36px 6px 0;
-    }
-
-    .step + .step {
-      padding-left: 36px;
-      border-left: 1px solid var(--line);
-    }
-
-    .step-number {
-      display: block;
-      margin-bottom: 52px;
-      color: var(--tertiary);
-      font-size: 14px;
-      font-variant-numeric: tabular-nums;
-    }
-
-    .step p {
-      margin: 0;
-      color: var(--secondary);
-      font-size: 20px;
-    }
-
-    .step strong {
-      color: var(--text);
-      font-weight: 620;
-    }
-
     .demo-placeholder {
       text-align: center;
     }
@@ -416,10 +382,6 @@
         gap: 16px;
       }
 
-      nav a:first-child {
-        display: none;
-      }
-
       section {
         padding-block: 76px;
       }
@@ -475,21 +437,6 @@
         font-size: 15px;
       }
 
-      .steps {
-        grid-template-columns: 1fr;
-      }
-
-      .step,
-      .step + .step {
-        padding: 28px 0;
-        border-left: 0;
-        border-bottom: 1px solid var(--line);
-      }
-
-      .step-number {
-        margin-bottom: 28px;
-      }
-
       .video-placeholder {
         aspect-ratio: 9 / 12;
       }
@@ -516,7 +463,6 @@
   <header class="site-header">
     <a class="wordmark" href="#main" aria-label="Holo home">Holo</a>
     <nav aria-label="Primary navigation">
-      <a href="#how-it-works">How it works</a>
       <a href="https://github.com/JustinGamer191/Holo">GitHub</a>
     </nav>
   </header>
@@ -575,26 +521,6 @@
         </svg>
         <figcaption>One action per zone.</figcaption>
       </figure>
-    </section>
-
-    <section id="how-it-works" aria-labelledby="how-title">
-      <div class="section-heading">
-        <h2 id="how-title">How it works</h2>
-      </div>
-      <ol class="steps">
-        <li class="step">
-          <span class="step-number">01</span>
-          <p><strong>Calibrate.</strong> Tap each zone ten times.</p>
-        </li>
-        <li class="step">
-          <span class="step-number">02</span>
-          <p><strong>Assign.</strong> Pick one action per zone.</p>
-        </li>
-        <li class="step">
-          <span class="step-number">03</span>
-          <p><strong>Tap.</strong> Your Mac runs it.</p>
-        </li>
-      </ol>
     </section>
 
     <section id="demo" class="demo-placeholder" aria-labelledby="demo-title">
@@ -719,10 +645,10 @@
         }
         void main() {
           vec3 normal = normalize(aPosition);
-          float displacement = snoise(aPosition * 2.0 + vec3(uTime * 0.5)) * 0.2;
+          float displacement = snoise(aPosition * 2.0 + vec3(uTime * 0.25)) * 0.12;
           vec3 displaced = aPosition + normal * displacement;
-          mat3 rotation = rotateX(0.3 + sin(uTime * 0.11) * 0.08)
-            * rotateY(uTime * 0.09);
+          mat3 rotation = rotateX(0.3 + sin(uTime * 0.055) * 0.05)
+            * rotateY(uTime * 0.04);
           vec3 worldPosition = rotation * displaced * 1.55;
           vec3 viewPosition = worldPosition - vec3(0.0, 0.0, 4.8);
           float near = 0.1, far = 100.0, focalLength = 2.15;
@@ -872,11 +798,11 @@
 
       const render = (time) => {
         if (!usePointer) {
-          targetLight[0] = Math.sin(time * 0.31) * 2.4;
-          targetLight[1] = Math.cos(time * 0.23) * 1.35;
+          targetLight[0] = Math.sin(time * 0.14) * 2.4;
+          targetLight[1] = Math.cos(time * 0.11) * 1.35;
         }
-        light[0] += (targetLight[0] - light[0]) * 0.06;
-        light[1] += (targetLight[1] - light[1]) * 0.06;
+        light[0] += (targetLight[0] - light[0]) * 0.025;
+        light[1] += (targetLight[1] - light[1]) * 0.025;
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
         gl.uniform1f(uniforms.aspect, canvas.width / canvas.height);
         gl.uniform1f(uniforms.time, time);
