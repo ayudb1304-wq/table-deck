@@ -15,23 +15,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "9A0864AD575062AF8919E457"
-               BuildableName = "Holo.app"
-               BlueprintName = "Holo"
-               ReferencedContainer = "container:Holo.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "1F9C3C592CD8E0DBC05B2A8E"
-               BuildableName = "HoloCore.framework"
-               BlueprintName = "HoloCore"
+               BlueprintIdentifier = "88F0985131DDF5B7524F984A"
+               BuildableName = "HoloReplay"
+               BlueprintName = "HoloReplay"
                ReferencedContainer = "container:Holo.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -46,9 +32,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "9A0864AD575062AF8919E457"
-            BuildableName = "Holo.app"
-            BlueprintName = "Holo"
+            BlueprintIdentifier = "88F0985131DDF5B7524F984A"
+            BuildableName = "HoloReplay"
+            BlueprintName = "HoloReplay"
             ReferencedContainer = "container:Holo.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -58,20 +44,9 @@
             parallelizable = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "F9C864127BCDDE6703522B72"
-               BuildableName = "HoloCoreTests.xctest"
-               BlueprintName = "HoloCoreTests"
-               ReferencedContainer = "container:Holo.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO"
-            parallelizable = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "9F16F8CF8BEC21D76AE06244"
-               BuildableName = "HoloAppTests.xctest"
-               BlueprintName = "HoloAppTests"
+               BlueprintIdentifier = "AE7456AB0A1CAE6A83B30EF7"
+               BuildableName = "HoloReplayTests.xctest"
+               BlueprintName = "HoloReplayTests"
                ReferencedContainer = "container:Holo.xcodeproj">
             </BuildableReference>
          </TestableReference>
@@ -80,7 +55,7 @@
       </CommandLineArguments>
    </TestAction>
    <LaunchAction
-      buildConfiguration = "Debug"
+      buildConfiguration = "Release"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       launchStyle = "0"
@@ -93,9 +68,9 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "9A0864AD575062AF8919E457"
-            BuildableName = "Holo.app"
-            BlueprintName = "Holo"
+            BlueprintIdentifier = "88F0985131DDF5B7524F984A"
+            BuildableName = "HoloReplay"
+            BlueprintName = "HoloReplay"
             ReferencedContainer = "container:Holo.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -112,9 +87,9 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "9A0864AD575062AF8919E457"
-            BuildableName = "Holo.app"
-            BlueprintName = "Holo"
+            BlueprintIdentifier = "88F0985131DDF5B7524F984A"
+            BuildableName = "HoloReplay"
+            BlueprintName = "HoloReplay"
             ReferencedContainer = "container:Holo.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

@@ -94,6 +94,42 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.holo.HoloSoak
         GENERATE_INFOPLIST_FILE: YES
+  HoloReplaySupport:
+    type: framework
+    platform: macOS
+    sources:
+      - path: Sources/HoloReplaySupport
+    dependencies:
+      - target: HoloCore
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.holo.HoloReplaySupport
+        GENERATE_INFOPLIST_FILE: YES
+        SKIP_INSTALL: YES
+  HoloReplay:
+    type: tool
+    platform: macOS
+    sources:
+      - path: Sources/HoloReplay
+    dependencies:
+      - target: HoloCore
+      - target: HoloReplaySupport
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.holo.HoloReplay
+        GENERATE_INFOPLIST_FILE: YES
+  HoloReplayTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - path: Tests/HoloReplayTests
+    dependencies:
+      - target: HoloReplaySupport
+      - target: HoloCore
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.holo.HoloReplayTests
+        GENERATE_INFOPLIST_FILE: YES
   HoloRouteCheck:
     type: tool
     platform: macOS
@@ -125,6 +161,16 @@ schemes:
         HoloSoak: all
     run:
       config: Release
+  HoloReplay:
+    build:
+      targets:
+        HoloReplay: all
+    run:
+      config: Release
+    test:
+      config: Debug
+      targets:
+        - HoloReplayTests
   HoloRouteCheck:
     build:
       targets:

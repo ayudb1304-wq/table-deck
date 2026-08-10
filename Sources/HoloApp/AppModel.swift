@@ -701,7 +701,9 @@ final class AppModel: ObservableObject {
             evaluation.records.append(EvaluationRecord(
                 expectedZone: expected,
                 decision: decision,
-                responseLatencyMilliseconds: responseLatencyMilliseconds(for: observation)
+                responseLatencyMilliseconds: responseLatencyMilliseconds(for: observation),
+                capturedAt: observation.feature.capturedAt,
+                feature: observation.feature
             ))
             present(decision)
             evaluationAcceptAfter = Date().addingTimeInterval(0.40)
