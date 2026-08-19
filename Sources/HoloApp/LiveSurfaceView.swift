@@ -29,6 +29,10 @@ struct LiveSurfaceView: View {
             .frame(maxWidth: 760, maxHeight: 490)
             .padding(.horizontal, 36)
 
+            if model.suggestsTopUp {
+                topUpBanner
+            }
+
             resultStrip
 
             Spacer(minLength: 28)
@@ -60,6 +64,28 @@ struct LiveSurfaceView: View {
             .controlSize(.large)
         }
         .padding(.top, 4)
+    }
+
+    /// Non-blocking: it never covers the desk map and never interrupts a tap.
+    private var topUpBanner: some View {
+        HStack(spacing: 12) {
+            Image(systemName: "sparkles")
+                .foregroundStyle(.secondary)
+            Text(model.topUpBannerText)
+                .font(.callout)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+            Spacer(minLength: 8)
+            Button("Add Taps") {
+                model.beginTopUp()
+            }
+            .holoSecondaryButton()
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 10)
+        .frame(maxWidth: 760)
+        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .accessibilityElement(children: .combine)
     }
 
     private var resultStrip: some View {

@@ -52,7 +52,10 @@ final class PersistenceTests: XCTestCase {
         XCTAssertFalse(persistedData.starts(with: Data("RIFF".utf8)))
     }
 
-    func testLegacySixZoneProfileIsIgnoredBeforeZoneDecoding() throws {
+    /// Version 2 and older predate the four-zone topology, so they are skipped
+    /// rather than migrated. Version 3 is migratable and is covered by
+    /// `ProfileMigrationTests`.
+    func testUnmigratableLegacyProfileIsIgnoredBeforeZoneDecoding() throws {
         let temporary = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         defer { try? FileManager.default.removeItem(at: temporary) }
         let store = try ProfileStore(directory: temporary)
@@ -68,7 +71,7 @@ final class PersistenceTests: XCTestCase {
                 leaveOneOutAccuracy: nil
             )
         )
-        profile.version = HoloProfile.currentVersion - 1
+        profile.version = 2
 
         try store.save(profile)
 

@@ -4,6 +4,58 @@ public enum ClassifierDefaults {
     public static let minimumConfidence = 0.36
     public static let minimumRelativeSeparation = 0.035
     public static let minimumLinearScoreMargin = 0.075
+
+    // A quick profile has four examples per zone instead of ten, so every
+    // boundary it draws is less trustworthy. The thresholds below trade recall
+    // for precision: a quick profile would rather reject a real tap than fire
+    // the wrong zone's action, because a missed tap costs a repeat and a wrong
+    // tap can run a shell command.
+    public static let quickMinimumConfidence = 0.48
+    public static let quickMinimumRelativeSeparation = 0.070
+    public static let quickMinimumLinearScoreMargin = 0.150
+}
+
+/// The three gates that decide whether a close call becomes a zone or an
+/// `ambiguousZone` rejection. Stored on the trained model so the same predict
+/// path serves both calibration qualities, with no second code path.
+public struct ClassifierThresholds: Codable, Equatable, Sendable {
+    public var minimumConfidence: Double
+    public var minimumRelativeSeparation: Double
+    public var minimumLinearScoreMargin: Double
+
+    public init(
+        minimumConfidence: Double = ClassifierDefaults.minimumConfidence,
+        minimumRelativeSeparation: Double = ClassifierDefaults.minimumRelativeSeparation,
+        minimumLinearScoreMargin: Double = ClassifierDefaults.minimumLinearScoreMargin
+    ) {
+        self.minimumConfidence = minimumConfidence
+        self.minimumRelativeSeparation = minimumRelativeSeparation
+        self.minimumLinearScoreMargin = minimumLinearScoreMargin
+    }
+
+    public static let standard = ClassifierThresholds()
+
+    public static let quick = ClassifierThresholds(
+        minimumConfidence: ClassifierDefaults.quickMinimumConfidence,
+        minimumRelativeSeparation: ClassifierDefaults.quickMinimumRelativeSeparation,
+        minimumLinearScoreMargin: ClassifierDefaults.quickMinimumLinearScoreMargin
+    )
+
+    public static func forQuality(_ quality: CalibrationQuality) -> ClassifierThresholds {
+        switch quality {
+        case .quick: return .quick
+        case .precise: return .standard
+        }
+    }
+
+    public var isFinite: Bool {
+        minimumConfidence.isFinite
+            && (0...1).contains(minimumConfidence)
+            && minimumRelativeSeparation.isFinite
+            && minimumRelativeSeparation >= 0
+            && minimumLinearScoreMargin.isFinite
+            && minimumLinearScoreMargin >= 0
+    }
 }
 
 /// A compact ridge-regression model trained on the normalized calibration
@@ -70,11 +122,25 @@ public struct TrainedTapClassifier: Codable, Equatable, Sendable {
     public var positiveNoveltyThreshold: Double?
     public var linearZoneModel: RegularizedLinearZoneModel?
     public var minimumConfidence: Double
+    /// Both are optional so a v3 profile, which has neither key, decodes and
+    /// falls back to the standard values it was trained under.
+    public var minimumRelativeSeparation: Double?
+    public var minimumLinearScoreMargin: Double?
+
+    public var thresholds: ClassifierThresholds {
+        ClassifierThresholds(
+            minimumConfidence: minimumConfidence,
+            minimumRelativeSeparation: minimumRelativeSeparation
+                ?? ClassifierDefaults.minimumRelativeSeparation,
+            minimumLinearScoreMargin: minimumLinearScoreMargin
+                ?? ClassifierDefaults.minimumLinearScoreMargin
+        )
+    }
 
     public static func train(
         positiveExamples: [LabeledTap],
         negativeExamples: [LabeledTap] = [],
-        minimumConfidence: Double = ClassifierDefaults.minimumConfidence
+        thresholds: ClassifierThresholds = .standard
     ) throws -> TrainedTapClassifier {
         let positives = positiveExamples.filter { $0.zone != nil }
         let grouped = Dictionary(grouping: positives, by: { $0.zone! })
@@ -155,7 +221,24 @@ public struct TrainedTapClassifier: Codable, Equatable, Sendable {
             outlierThreshold: threshold,
             positiveNoveltyThreshold: noveltyThreshold,
             linearZoneModel: linearModel,
-            minimumConfidence: minimumConfidence
+            minimumConfidence: thresholds.minimumConfidence,
+            minimumRelativeSeparation: thresholds.minimumRelativeSeparation,
+            minimumLinearScoreMargin: thresholds.minimumLinearScoreMargin
+        )
+    }
+
+    /// Kept so call sites that only care about the confidence gate stay
+    /// unchanged. It has no default value, which is what keeps it unambiguous
+    /// against the `thresholds:` overload above.
+    public static func train(
+        positiveExamples: [LabeledTap],
+        negativeExamples: [LabeledTap] = [],
+        minimumConfidence: Double
+    ) throws -> TrainedTapClassifier {
+        try train(
+            positiveExamples: positiveExamples,
+            negativeExamples: negativeExamples,
+            thresholds: ClassifierThresholds(minimumConfidence: minimumConfidence)
         )
     }
 
@@ -246,7 +329,7 @@ public struct TrainedTapClassifier: Codable, Equatable, Sendable {
         let fitScore = min(max(1 - best / outlierThreshold, 0), 1)
         let confidence = 0.72 * separationScore + 0.28 * fitScore
 
-        if separation < ClassifierDefaults.minimumRelativeSeparation || confidence < minimumConfidence {
+        if separation < thresholds.minimumRelativeSeparation || confidence < thresholds.minimumConfidence {
             return rejected(feature, reason: .ambiguousZone, confidence: confidence, distances: distances)
         }
 
@@ -289,7 +372,7 @@ public struct TrainedTapClassifier: Codable, Equatable, Sendable {
         let fitScore = min(max(1 - nearestPositiveNovelty / fitThreshold, 0), 1)
         let confidence = 0.76 * marginScore + 0.24 * fitScore
 
-        if margin < ClassifierDefaults.minimumLinearScoreMargin || confidence < minimumConfidence {
+        if margin < thresholds.minimumLinearScoreMargin || confidence < thresholds.minimumConfidence {
             // A weak linear boundary is not evidence against an otherwise
             // well-separated local match. Let the established nearest-example
             // ambiguity gate decide these close but still usable cases.

@@ -5,6 +5,16 @@ public enum GuidedCaptureQualityIssue: String, Codable, Equatable, Sendable {
     case weak
     case noisy
 
+    /// The same vocabulary the live surface uses for a rejected tap, so quick
+    /// calibration can label a retry with a phrase the user will see again.
+    public var rejection: RejectionReason {
+        switch self {
+        case .clipped: return .clippedSignal
+        case .weak: return .weakSignal
+        case .noisy: return .lowSignalToNoise
+        }
+    }
+
     public var guidance: String {
         switch self {
         case .clipped:

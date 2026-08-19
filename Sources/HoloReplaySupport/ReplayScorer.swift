@@ -139,9 +139,13 @@ public enum ReplayScorer {
         evaluation: EvaluationReport
     ) throws -> ReplayResult {
         try validate(profile: profile, evaluation: evaluation)
+        // Retrain with the profile's own thresholds, not the defaults. A quick
+        // profile scored under precise thresholds would look better on replay
+        // than it behaves on the desk.
         let classifier = try TrainedTapClassifier.train(
             positiveExamples: profile.classifier.positiveExamples,
-            negativeExamples: profile.classifier.negativeExamples
+            negativeExamples: profile.classifier.negativeExamples,
+            thresholds: profile.classifier.thresholds
         )
 
         let zones = DeskZone.allCases
@@ -213,7 +217,7 @@ public enum ReplayScorer {
     }
 
     private static func validate(profile: HoloProfile, evaluation: EvaluationReport) throws {
-        guard profile.version == HoloProfile.currentVersion else {
+        guard ProfileMigration.canMigrate(version: profile.version) else {
             throw ReplayError.unsupportedProfileVersion(profile.version)
         }
         guard profile.zones.count == DeskZone.allCases.count,

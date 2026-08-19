@@ -198,7 +198,14 @@ public struct CrossValidationResult: Codable, Equatable, Sendable {
 public enum ClassifierEvaluator {
     public static func leaveOneOut(
         _ samples: [LabeledTap],
-        minimumConfidence: Double = ClassifierDefaults.minimumConfidence
+        minimumConfidence: Double
+    ) throws -> CrossValidationResult {
+        try leaveOneOut(samples, thresholds: ClassifierThresholds(minimumConfidence: minimumConfidence))
+    }
+
+    public static func leaveOneOut(
+        _ samples: [LabeledTap],
+        thresholds: ClassifierThresholds = .standard
     ) throws -> CrossValidationResult {
         let positives = samples.filter { $0.zone != nil }
         guard positives.count >= 4 else { throw ClassifierTrainingError.notEnoughSamples }
@@ -209,7 +216,7 @@ public enum ClassifierEvaluator {
             guard let expected = heldOut.zone else { continue }
             let classifier = try TrainedTapClassifier.train(
                 positiveExamples: training,
-                minimumConfidence: minimumConfidence
+                thresholds: thresholds
             )
             let decision = classifier.predict(heldOut.feature)
             records.append(EvaluationRecord(

@@ -4,6 +4,7 @@ import SwiftUI
 struct CalibrationView: View {
     @ObservedObject var model: AppModel
     @State private var showRejectionTraining = true
+    @State private var mode: CalibrationMode = .quick
 
     var body: some View {
         Group {
@@ -22,12 +23,25 @@ struct CalibrationView: View {
             VStack(alignment: .leading, spacing: 6) {
                 Text("Set up your desk")
                     .font(.title.weight(.semibold))
-                Text("Ten clean taps in each of four broad zones. Spread them around each highlighted area so Holo learns the whole zone, not one point.")
+                Text("\(mode.tapsPerZone) clean taps in each of four broad zones. Spread them around each highlighted area so Holo learns the whole zone, not one point.")
                     .font(.callout)
                     .foregroundStyle(.secondary)
             }
 
             Form {
+                Section("Length") {
+                    Picker("Calibration", selection: $mode) {
+                        Text("Quick").tag(CalibrationMode.quick)
+                        Text("Precise").tag(CalibrationMode.precise)
+                    }
+                    .pickerStyle(.segmented)
+                    Text(mode == .quick
+                        ? "16 taps, about a minute. Holo rejects borderline taps more readily until you add more examples."
+                        : "40 taps. The most accurate profile, and the recommended path if you have the time.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+
                 Section("Profile") {
                     TextField("Name", text: $model.calibrationDraft.name, prompt: Text("My Desk"))
                     TextField("Surface", text: $model.calibrationDraft.surfaceDescription, prompt: Text("Wood, laminate, glass…"))
@@ -74,18 +88,30 @@ struct CalibrationView: View {
                     HStack {
                         if let profile = model.selectedProfile {
                             Button("Recalibrate \(profile.name)") {
-                                model.beginCalibration(draft: model.calibrationDraft, recalibrating: profile)
+                                model.beginCalibration(
+                                    draft: model.calibrationDraft,
+                                    mode: mode,
+                                    recalibrating: profile
+                                )
                             }
                             .holoPrimaryButton()
                             .controlSize(.large)
 
                             Button("Create New Profile") {
-                                model.beginCalibration(draft: model.calibrationDraft)
+                                model.beginCalibration(draft: model.calibrationDraft, mode: mode)
                             }
                             .holoSecondaryButton()
+
+                            if profile.calibrationQuality == .quick {
+                                Button("Top Up \(profile.name)") {
+                                    model.beginTopUp()
+                                }
+                                .holoSecondaryButton()
+                                .help("Adds more taps to this profile instead of starting over")
+                            }
                         } else {
-                            Button("Begin Calibration") {
-                                model.beginCalibration(draft: model.calibrationDraft)
+                            Button(mode == .quick ? "Begin Quick Calibration" : "Begin Calibration") {
+                                model.beginCalibration(draft: model.calibrationDraft, mode: mode)
                             }
                             .holoPrimaryButton()
                             .controlSize(.large)
@@ -184,6 +210,22 @@ struct CalibrationView: View {
                     : "The microphone is paused. Resume it before arming.")
             }
 
+            if let feedback = model.lastCalibrationFeedback {
+                Label(
+                    feedback.accepted
+                        ? "\(feedback.zone.displayName) • \(feedback.message)"
+                        : "\(feedback.zone.displayName) • \(feedback.message)",
+                    systemImage: feedback.accepted ? "checkmark.circle.fill" : "xmark.circle.fill"
+                )
+                .font(.callout.weight(.medium))
+                .foregroundStyle(feedback.accepted ? Color.green : Color.orange)
+                .accessibilityLabel(feedback.accepted
+                    ? "Tap accepted in \(feedback.zone.displayName)"
+                    : "Tap rejected in \(feedback.zone.displayName): \(feedback.message)")
+            }
+
+            zoneStrengthMeters(session)
+
             if let issue = model.guidedCaptureIssue {
                 Label(issue.guidance, systemImage: "arrow.counterclockwise.circle")
                     .font(.callout)
@@ -226,6 +268,28 @@ struct CalibrationView: View {
         .padding(18)
         .frame(maxWidth: 760)
         .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+    }
+
+    /// One meter per zone so a zone that is consistently capturing weak taps is
+    /// visible during the pass, not after the model is trained.
+    private func zoneStrengthMeters(_ session: CalibrationSession) -> some View {
+        HStack(spacing: 14) {
+            ForEach(DeskZone.allCases) { zone in
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(zone.shortName)
+                        .font(.caption2.weight(.medium))
+                        .foregroundStyle(zone == session.currentZone ? Color.primary : Color.secondary)
+                    ProgressView(value: model.zoneSignalStrength[zone.rawValue])
+                        .frame(width: 72)
+                    Text("\(session.count(for: zone))/\(session.targetPerZone)")
+                        .font(.caption2.monospacedDigit())
+                        .foregroundStyle(.secondary)
+                }
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel("\(zone.displayName) capture strength")
+                .accessibilityValue("\(Int(model.zoneSignalStrength[zone.rawValue] * 100)) percent, \(session.count(for: zone)) of \(session.targetPerZone) taps")
+            }
+        }
     }
 
     private func completionControls(_ session: CalibrationSession) -> some View {

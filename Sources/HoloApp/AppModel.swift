@@ -27,6 +27,14 @@ enum DiagnosticLabel: Hashable, Identifiable {
     }
 }
 
+/// Instant per-tap verdict shown during guided capture.
+struct CalibrationTapFeedback: Equatable {
+    var zone: DeskZone
+    var accepted: Bool
+    var message: String
+    var signalStrength: Double
+}
+
 /// A privileged action waiting for its one-time confirmation on this profile.
 struct PendingPrivilegedConfirmation: Identifiable, Equatable {
     var id: String { "\(profileID.uuidString):\(kind.rawValue)" }
@@ -70,6 +78,12 @@ final class AppModel: ObservableObject {
     @Published var diagnosticLabel: DiagnosticLabel = .zone(.leftTop)
     @Published var diagnosticCaptureArmed = false
     @Published private(set) var guidedCaptureIssue: GuidedCaptureQualityIssue?
+    @Published private(set) var lastCalibrationFeedback: CalibrationTapFeedback?
+    /// Rolling per-zone signal strength, indexed by `DeskZone.rawValue`.
+    @Published private(set) var zoneSignalStrength = Array(
+        repeating: 0.0,
+        count: DeskZone.allCases.count
+    )
     @Published var debugRecordingEnabled = false
     @Published private(set) var hasDebugRecordings = false
     @Published var errorMessage: String?
@@ -419,21 +433,31 @@ final class AppModel: ObservableObject {
         }
     }
 
-    func beginCalibration(draft: CalibrationDraft, recalibrating: HoloProfile? = nil) {
+    func beginCalibration(
+        draft: CalibrationDraft,
+        mode: CalibrationMode = .quick,
+        recalibrating: HoloProfile? = nil
+    ) {
         resumeFromManualPause()
         calibrationArmTask?.cancel()
         evaluationArmTask?.cancel()
         benchmarkArmTask?.cancel()
         calibrationDraft = draft
         recalibratingProfileID = recalibrating?.id
-        calibrationSession = CalibrationSession(draft: draft)
+        calibrationSession = CalibrationSession(
+            draft: draft,
+            mode: mode,
+            carriedSamples: mode.isTopUp ? (recalibrating?.classifier.positiveExamples ?? []) : []
+        )
         calibrationValidation = nil
         guidedCaptureIssue = nil
+        lastCalibrationFeedback = nil
+        zoneSignalStrength = Array(repeating: 0, count: DeskZone.allCases.count)
         calibrationAcceptAfter = Date().addingTimeInterval(0.5)
         evaluationSession = nil
         benchmarkSession = nil
         section = .calibrate
-        statusMessage = "Calibration • \(DeskZone.leftTop.displayName)"
+        statusMessage = "\(mode.displayName) calibration • \(DeskZone.leftTop.displayName)"
         Task {
             do {
                 try await prepareGuidedAudio(to: draft.strategy)
@@ -445,6 +469,22 @@ final class AppModel: ObservableObject {
             catch is CancellationError { }
             catch { errorMessage = error.localizedDescription }
         }
+    }
+
+    /// Appends more examples to the selected profile and retrains it. The whole
+    /// pass reuses the guided calibration machinery; only the merge at the end
+    /// differs.
+    func beginTopUp() {
+        guard guidedSection == nil else { return }
+        guard let profile = selectedProfile else {
+            errorMessage = "Calibrate a desk profile before topping it up."
+            return
+        }
+        var topUpDraft = draft(for: profile)
+        // A top-up has to extend the same feature space it is appending to.
+        topUpDraft.strategy = profile.sensingStrategy
+        topUpDraft.name = profile.name
+        beginCalibration(draft: topUpDraft, mode: .topUp, recalibrating: profile)
     }
 
     func prepareRecalibration() {
@@ -460,6 +500,7 @@ final class AppModel: ObservableObject {
         calibrationSession = nil
         calibrationValidation = nil
         guidedCaptureIssue = nil
+        lastCalibrationFeedback = nil
         recalibratingProfileID = nil
         statusMessage = "Calibration cancelled"
         Task {
@@ -536,6 +577,7 @@ final class AppModel: ObservableObject {
         session.isSettling = false
         calibrationValidation = nil
         guidedCaptureIssue = nil
+        lastCalibrationFeedback = nil
         calibrationSession = session
         calibrationAcceptAfter = Date().addingTimeInterval(0.35)
         if let zone = session.currentZone {
@@ -568,6 +610,8 @@ final class AppModel: ObservableObject {
         session.isSettling = false
         calibrationValidation = nil
         guidedCaptureIssue = nil
+        lastCalibrationFeedback = nil
+        zoneSignalStrength[zone.rawValue] = 0
         calibrationSession = session
         calibrationAcceptAfter = Date().addingTimeInterval(0.5)
         statusMessage = "Retry \(zone.displayName) • tap 1 of \(session.targetPerZone)"
@@ -576,19 +620,33 @@ final class AppModel: ObservableObject {
     func finishCalibration(openActions: Bool = false) {
         guard let session = calibrationSession, session.zonesComplete else { return }
         do {
+            let oldProfile = profiles.first { $0.id == recalibratingProfileID }
+            // A top-up carries the profile's existing examples, so the model is
+            // always trained on everything the profile will hold, and quality
+            // follows from that total rather than from this pass's mode.
+            let trainingSamples = session.trainingSamples
+            let negativeSamples = session.mode.isTopUp
+                ? (oldProfile?.classifier.negativeExamples ?? []) + session.negativeSamples
+                : session.negativeSamples
+            let quality = CalibrationQuality.resolved(samples: trainingSamples)
+            let thresholds = ClassifierThresholds.forQuality(quality)
+
             let classifier = try TrainedTapClassifier.train(
-                positiveExamples: session.positiveSamples,
-                negativeExamples: session.negativeSamples
+                positiveExamples: trainingSamples,
+                negativeExamples: negativeSamples,
+                thresholds: thresholds
             )
             let crossValidation = try calibrationValidation
-                ?? ClassifierEvaluator.leaveOneOut(session.positiveSamples)
-            let counts = DeskZone.allCases.map { session.count(for: $0) }
+                ?? ClassifierEvaluator.leaveOneOut(trainingSamples, thresholds: thresholds)
+            let counts = DeskZone.allCases.map { zone in
+                trainingSamples.filter { $0.zone == zone }.count
+            }
             let summary = CalibrationSummary(
-                sampleCount: session.positiveSamples.count,
+                sampleCount: trainingSamples.count,
                 samplesPerZone: counts,
-                leaveOneOutAccuracy: crossValidation.accuracy
+                leaveOneOutAccuracy: crossValidation.accuracy,
+                quality: quality
             )
-            let oldProfile = profiles.first { $0.id == recalibratingProfileID }
             var profile = HoloProfile(
                 id: oldProfile?.id ?? UUID(),
                 name: session.draft.name,
@@ -612,8 +670,11 @@ final class AppModel: ObservableObject {
             calibrationValidation = nil
             guidedCaptureIssue = nil
             recalibratingProfileID = nil
+            lastCalibrationFeedback = nil
             section = openActions ? .actions : .live
-            statusMessage = "Calibration saved • listening"
+            statusMessage = quality == .quick
+                ? "Quick profile saved • listening"
+                : "Calibration saved • listening"
             Task {
                 do { try await reconfigureListeningAudio(to: profile.sensingStrategy) }
                 catch { errorMessage = error.localizedDescription }
@@ -1013,11 +1074,23 @@ final class AppModel: ObservableObject {
             if let issue = GuidedCaptureQuality.issue(for: quality) {
                 guidedCaptureIssue = issue
                 statusMessage = issue.guidance
+                recordCalibrationFeedback(
+                    zone: zone,
+                    accepted: false,
+                    message: issue.rejection.displayName,
+                    quality: quality
+                )
                 return
             }
             guidedCaptureIssue = nil
             session.positiveSamples.append(LabeledTap(zone: zone, feature: observation.feature))
             let count = session.count(for: zone)
+            recordCalibrationFeedback(
+                zone: zone,
+                accepted: true,
+                message: "Accepted • \(count) of \(session.targetPerZone)",
+                quality: quality
+            )
             calibrationAcceptAfter = Date().addingTimeInterval(0.40)
             if let next = session.currentZone {
                 if count == session.targetPerZone {
@@ -1032,7 +1105,10 @@ final class AppModel: ObservableObject {
                 session.isArmed = false
                 session.isSettling = false
                 do {
-                    calibrationValidation = try ClassifierEvaluator.leaveOneOut(session.positiveSamples)
+                    calibrationValidation = try ClassifierEvaluator.leaveOneOut(
+                        session.trainingSamples,
+                        thresholds: .forQuality(session.resultingQuality)
+                    )
                     statusMessage = "All four zones captured • save or add rejection examples"
                 } catch {
                     calibrationValidation = nil
@@ -1048,6 +1124,39 @@ final class AppModel: ObservableObject {
             session.negativeSamples.append(LabeledTap(zone: nil, negativeLabel: label, feature: observation.feature))
             statusMessage = "\(label) examples • \(session.negativeCount(for: label)) captured"
         }
+    }
+
+    private func recordCalibrationFeedback(
+        zone: DeskZone,
+        accepted: Bool,
+        message: String,
+        quality: SignalQuality
+    ) {
+        lastCalibrationFeedback = CalibrationTapFeedback(
+            zone: zone,
+            accepted: accepted,
+            message: message,
+            signalStrength: quality.score
+        )
+        // Only accepted taps move the meter. A rejected tap says something
+        // about that attempt, not about how well the zone is being captured.
+        guard accepted else { return }
+        let previous = zoneSignalStrength[zone.rawValue]
+        zoneSignalStrength[zone.rawValue] = previous == 0
+            ? quality.score
+            : previous * 0.6 + quality.score * 0.4
+    }
+
+    /// True when the selected profile would benefit from a top-up.
+    var suggestsTopUp: Bool {
+        guard let profile = selectedProfile else { return false }
+        return profile.calibrationQuality == .quick && guidedSection == nil
+    }
+
+    var topUpBannerText: String {
+        guard let profile = selectedProfile else { return "" }
+        let needed = max(profile.topUpTapsNeededPerZone, 1)
+        return "Working with a quick profile. Add \(needed) more taps per zone anytime to improve accuracy."
     }
 
     private func handleBenchmark(_ observation: TapObservation, session: inout BenchmarkSession) {

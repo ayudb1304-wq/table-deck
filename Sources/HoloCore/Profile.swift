@@ -67,17 +67,40 @@ public struct CalibrationSummary: Codable, Equatable, Sendable {
     public var samplesPerZone: [Int]
     public var leaveOneOutAccuracy: Double?
     public var capturedAt: Date
+    public var quality: CalibrationQuality
 
-    public init(sampleCount: Int, samplesPerZone: [Int], leaveOneOutAccuracy: Double?, capturedAt: Date = Date()) {
+    public init(
+        sampleCount: Int,
+        samplesPerZone: [Int],
+        leaveOneOutAccuracy: Double?,
+        capturedAt: Date = Date(),
+        quality: CalibrationQuality = .precise
+    ) {
         self.sampleCount = sampleCount
         self.samplesPerZone = samplesPerZone
         self.leaveOneOutAccuracy = leaveOneOutAccuracy
         self.capturedAt = capturedAt
+        self.quality = quality
+    }
+
+    /// Profiles written before quick calibration existed have no `quality` key.
+    /// They were all captured with ten taps per zone, so `.precise` is the
+    /// factually correct default rather than a lenient guess.
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        sampleCount = try container.decode(Int.self, forKey: .sampleCount)
+        samplesPerZone = try container.decode([Int].self, forKey: .samplesPerZone)
+        leaveOneOutAccuracy = try container.decodeIfPresent(Double.self, forKey: .leaveOneOutAccuracy)
+        capturedAt = try container.decode(Date.self, forKey: .capturedAt)
+        quality = try container.decodeIfPresent(CalibrationQuality.self, forKey: .quality) ?? .precise
     }
 }
 
 public struct HoloProfile: Codable, Equatable, Sendable, Identifiable {
-    public static let currentVersion = 3
+    public static let currentVersion = 4
+    /// Versions this build can read. Anything older is structurally different
+    /// enough that migrating it would be guesswork, so it is skipped instead.
+    public static let migratableVersions: Set<Int> = [3]
 
     public var version: Int
     public var id: UUID
@@ -113,8 +136,38 @@ public struct HoloProfile: Codable, Equatable, Sendable, Identifiable {
 
     public var sensingStrategy: SensingStrategy { classifier.strategy }
 
+    public var calibrationQuality: CalibrationQuality { calibration.quality }
+
+    /// How many more taps per zone a top-up would need to reach precise.
+    public var topUpTapsNeededPerZone: Int {
+        let deficit = DeskZone.allCases.map { zone in
+            max(0, CalibrationGuidance.preciseMinimumPerZone
+                - classifier.positiveExamples.filter { $0.zone == zone }.count)
+        }.max() ?? 0
+        return deficit
+    }
+
     public func action(for zone: DeskZone) -> ZoneActionConfiguration {
         zones.first(where: { $0.zone == zone })?.action ?? ZoneActionConfiguration(kind: .none)
+    }
+}
+
+/// Forward migrations for profiles written by older builds.
+public enum ProfileMigration {
+    public static func canMigrate(version: Int) -> Bool {
+        version == HoloProfile.currentVersion || HoloProfile.migratableVersions.contains(version)
+    }
+
+    /// v3 → v4 added `CalibrationSummary.quality`. The decoder already defaults
+    /// it to `.precise`, so the migration only has to stamp the new version.
+    /// Migration happens on load and is not written back: the file is rewritten
+    /// the next time the user changes something, and an unchanged profile has no
+    /// business being touched at launch.
+    public static func migrated(_ profile: HoloProfile, from version: Int) -> HoloProfile {
+        guard version != HoloProfile.currentVersion else { return profile }
+        var migrated = profile
+        migrated.version = HoloProfile.currentVersion
+        return migrated
     }
 }
 
@@ -170,8 +223,9 @@ public final class ProfileStore {
         return try files.compactMap { url in
             let data = try Data(contentsOf: url)
             let envelope = try JSONDecoder().decode(VersionEnvelope.self, from: data)
-            guard envelope.version == HoloProfile.currentVersion else { return nil }
-            let profile = try decoder().decode(HoloProfile.self, from: data)
+            guard ProfileMigration.canMigrate(version: envelope.version) else { return nil }
+            let decoded = try decoder().decode(HoloProfile.self, from: data)
+            let profile = ProfileMigration.migrated(decoded, from: envelope.version)
             guard profile.zones.count == requiredZones.count,
                   Set(profile.zones.map(\.zone)) == requiredZones else {
                 throw ProfileStoreError.invalidCurrentTopology(url.lastPathComponent)
@@ -217,8 +271,7 @@ public final class ProfileStore {
               classifier.featureWeights.allSatisfy({ $0.isFinite && $0 > 0 }),
               classifier.outlierThreshold.isFinite,
               classifier.outlierThreshold > 0,
-              classifier.minimumConfidence.isFinite,
-              (0...1).contains(classifier.minimumConfidence) else {
+              classifier.thresholds.isFinite else {
             return false
         }
         if let noveltyThreshold = classifier.positiveNoveltyThreshold,
