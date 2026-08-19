@@ -42,6 +42,18 @@ struct RootView: View {
         } message: {
             Text(model.errorMessage ?? "Unknown error")
         }
+        .alert(
+            "Confirm this action",
+            isPresented: Binding(
+                get: { model.pendingPrivilegedConfirmation != nil },
+                set: { if !$0 { model.declinePendingPrivilegedAction() } }
+            )
+        ) {
+            Button("Allow") { model.confirmPendingPrivilegedAction() }
+            Button("Not now", role: .cancel) { model.declinePendingPrivilegedAction() }
+        } message: {
+            Text(model.pendingPrivilegedConfirmation?.prompt ?? "")
+        }
     }
 
     private func navigationRow(_ section: AppSection) -> some View {
@@ -132,31 +144,59 @@ struct RootView: View {
 
     private var microphoneSymbol: String {
         if needsInitialSetup { return "scope" }
-        return model.audio.isListening ? "mic.fill" : "mic.slash"
+        switch model.listeningTier {
+        case .armed: return "mic.fill"
+        case .doze: return "moon.zzz.fill"
+        case .paused: return "mic.slash"
+        }
     }
 
     private var microphoneTitle: String {
         if needsInitialSetup { return "Setup required" }
-        return model.audio.isListening ? "Microphone active" : "Microphone off"
+        switch model.listeningTier {
+        case .armed: return "Microphone active"
+        case .doze: return "Microphone dozing"
+        case .paused: return "Microphone off"
+        }
     }
 
     private var microphoneDetail: String {
         if needsInitialSetup { return "Calibrate four zones first" }
-        return model.audio.isListening ? "Processed on this Mac" : "No audio capture"
+        switch model.listeningTier {
+        case .armed:
+            return "Processed on this Mac"
+        case .doze:
+            return "Measuring loudness only"
+        case .paused:
+            guard let reason = model.pauseReasons.first else { return "No audio capture" }
+            return reason.explanation
+        }
+    }
+
+    private var tierIndicatorColor: Color {
+        switch model.listeningTier {
+        case .armed: return .green
+        case .doze: return .yellow
+        case .paused: return .secondary
+        }
     }
 
     private var statusBar: some View {
         HStack(spacing: 8) {
             Circle()
-                .fill(model.audio.isListening ? Color.green : Color.secondary)
+                .fill(tierIndicatorColor)
                 .frame(width: 6, height: 6)
             Text(model.statusMessage)
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .lineLimit(1)
             Spacer()
-            if model.audio.isListening && model.audio.strategy != .passive {
+            if model.listeningTier == .armed && model.audio.strategy == .active {
                 Label("Speaker probe active", systemImage: "speaker.wave.1")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            } else if model.listeningTier == .armed && model.audio.strategy == .hybrid {
+                Label("Probe chirps on tap only", systemImage: "speaker.wave.1")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }

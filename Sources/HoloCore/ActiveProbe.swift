@@ -58,6 +58,10 @@ public enum ActiveProbe {
         return (activeFeatureNames, values)
     }
 
+    /// Longest gap between a passive onset candidate and its confirmation
+    /// chirp, spec 01.
+    public static let confirmationWindow: TimeInterval = 0.150
+
     static let activeFeatureNames = [
         "probe_correlation_peak", "probe_correlation_lag", "probe_correlation_mean", "probe_correlation_spread"
     ] + (0..<8).map { "probe_band_\($0)" }
@@ -77,5 +81,53 @@ public enum ActiveProbe {
             let energy = spectrum[start...end].reduce(0, +) / total
             return log10(energy + 1e-12)
         }
+    }
+}
+
+/// When the speaker is allowed to emit a chirp.
+///
+/// Continuous chirping is what made Hybrid feel like the Mac was permanently
+/// making a noise at the edge of hearing, and it is the single largest idle
+/// power cost of the sensing pipeline. Hybrid now emits one confirmation chirp
+/// only in response to a passive onset candidate; Active keeps its continuous
+/// loop because it has no passive candidate to react to.
+public struct ActiveProbeDutyCycle: Equatable, Sendable {
+    public enum Emission: Equatable, Sendable {
+        /// Speaker stays silent.
+        case silent
+        /// The looping period buffer plays for as long as the tier lasts.
+        case continuous
+        /// One chirp, scheduled now.
+        case confirmation
+    }
+
+    public let minimumInterval: TimeInterval
+    private var lastConfirmationAt: Double?
+
+    public init(minimumInterval: TimeInterval = ActiveProbe.confirmationWindow) {
+        self.minimumInterval = max(minimumInterval, 0)
+    }
+
+    /// What the speaker should do while the tier is simply running, with no
+    /// onset candidate in hand.
+    public static func steadyState(strategy: SensingStrategy, tier: ListeningTier) -> Emission {
+        guard tier == .armed else { return .silent }
+        return strategy == .active ? .continuous : .silent
+    }
+
+    /// What the speaker should do now that the detector flagged a candidate.
+    public mutating func onOnsetCandidate(
+        strategy: SensingStrategy,
+        tier: ListeningTier,
+        at now: Double
+    ) -> Emission {
+        guard strategy == .hybrid, tier == .armed else { return .silent }
+        if let lastConfirmationAt, now - lastConfirmationAt < minimumInterval { return .silent }
+        lastConfirmationAt = now
+        return .confirmation
+    }
+
+    public mutating func reset() {
+        lastConfirmationAt = nil
     }
 }

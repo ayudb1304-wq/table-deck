@@ -11,6 +11,64 @@ struct DiagnosticsView: View {
         ]
     }
 
+    private static let dozeTimeoutChoices: [TimeInterval] = [60, 180, 300, 600, 1_800]
+    private static let batteryThresholdChoices: [Double] = [0.10, 0.20, 0.30]
+
+    private static func dozeTimeoutLabel(_ seconds: TimeInterval) -> String {
+        seconds < 60 ? "\(Int(seconds)) seconds" : "\(Int(seconds / 60)) minutes"
+    }
+
+    private var tierDescription: String {
+        guard let reason = model.pauseReasons.first else {
+            return model.listeningTier.displayName
+        }
+        return "\(model.listeningTier.displayName) (\(reason.statusDetail))"
+    }
+
+    private var dozeTimeoutBinding: Binding<TimeInterval> {
+        Binding(
+            get: { model.listeningSettings.idleDozeTimeout },
+            set: { newValue in
+                var settings = model.listeningSettings
+                settings.idleDozeTimeout = newValue
+                model.updateListeningSettings(settings)
+            }
+        )
+    }
+
+    private var wakeGestureBinding: Binding<Bool> {
+        Binding(
+            get: { model.listeningSettings.wakeGestureEnabled },
+            set: { newValue in
+                var settings = model.listeningSettings
+                settings.wakeGestureEnabled = newValue
+                model.updateListeningSettings(settings)
+            }
+        )
+    }
+
+    private var batteryPauseBinding: Binding<Bool> {
+        Binding(
+            get: { model.listeningSettings.batteryPauseFraction != nil },
+            set: { newValue in
+                var settings = model.listeningSettings
+                settings.batteryPauseFraction = newValue ? 0.20 : nil
+                model.updateListeningSettings(settings)
+            }
+        )
+    }
+
+    private var batteryThresholdBinding: Binding<Double> {
+        Binding(
+            get: { model.listeningSettings.batteryPauseFraction ?? 0.20 },
+            set: { newValue in
+                var settings = model.listeningSettings
+                settings.batteryPauseFraction = newValue
+                model.updateListeningSettings(settings)
+            }
+        )
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
             VStack(alignment: .leading, spacing: 5) {
@@ -22,6 +80,30 @@ struct DiagnosticsView: View {
             }
 
             Form {
+                Section("Listening and power") {
+                    LabeledContent("Current tier", value: tierDescription)
+                    Picker("Doze after", selection: dozeTimeoutBinding) {
+                        ForEach(Self.dozeTimeoutChoices, id: \.self) { seconds in
+                            Text(Self.dozeTimeoutLabel(seconds)).tag(seconds)
+                        }
+                    }
+                    Toggle("Wake with a double tap", isOn: wakeGestureBinding)
+                    Toggle("Pause on low battery", isOn: batteryPauseBinding)
+                    if model.listeningSettings.batteryPauseFraction != nil {
+                        Picker("Battery threshold", selection: batteryThresholdBinding) {
+                            ForEach(Self.batteryThresholdChoices, id: \.self) { fraction in
+                                Text("\(Int(fraction * 100))%").tag(fraction)
+                            }
+                        }
+                    }
+                    Label(
+                        "Holo also pauses whenever the screen is locked, the Mac sleeps, another app is using the microphone, Low Power Mode is on, or the Mac is running hot.",
+                        systemImage: "info.circle"
+                    )
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                }
+
                 Section("Microphone") {
                     if let route = model.audio.diagnostics.audioRoute {
                         LabeledContent("Input", value: endpointDescription(route.input))

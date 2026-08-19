@@ -74,6 +74,45 @@ public enum LocalActionPlanner {
     }
 }
 
+/// Why an accepted classification did not run its action.
+public enum LocalActionDenial: Equatable, Sendable {
+    case sessionLocked
+    case notArmed(ListeningTier)
+    case deskInactive
+    case notAccepted
+    case awaitingConfirmation(ZoneActionKind)
+    case rateLimited
+
+    public var explanation: String {
+        switch self {
+        case .sessionLocked:
+            return "Actions never run while the screen is locked."
+        case .notArmed(let tier):
+            return "Actions only run while listening (currently \(tier.displayName.lowercased()))."
+        case .deskInactive:
+            return "Actions are paused outside Desk."
+        case .notAccepted:
+            return "The tap was not accepted."
+        case .awaitingConfirmation:
+            return "Confirm this action once before it can run from a tap."
+        case .rateLimited:
+            return "This action ran a moment ago."
+        }
+    }
+}
+
+public enum LocalActionDispatchDecision: Equatable, Sendable {
+    case allow
+    case deny(LocalActionDenial)
+
+    public var isAllowed: Bool { self == .allow }
+
+    public var denial: LocalActionDenial? {
+        if case .deny(let reason) = self { return reason }
+        return nil
+    }
+}
+
 public enum LocalActionDispatchPolicy {
     /// Automatic side effects are confined to the live Desk surface. Guided
     /// capture and configuration screens can still classify for feedback, but
@@ -83,5 +122,34 @@ public enum LocalActionDispatchPolicy {
         isDeskActive: Bool
     ) -> Bool {
         isDeskActive && decision.wasAccepted
+    }
+
+    /// Full gate, spec 01. Checked in this order so the reported denial is the
+    /// most fundamental one: a locked session is never reported as "rate
+    /// limited", and a dozing engine is never reported as "not accepted".
+    ///
+    /// The session-lock and tier checks are a hard constraint, not a
+    /// convenience. They are duplicated in `AppModel` on purpose (defense in
+    /// depth): capture is already stopped when the session locks, so this gate
+    /// is the backstop for an observation that was in flight at the moment the
+    /// screen locked.
+    public static func decide(
+        for decision: ClassificationDecision,
+        actionKind: ZoneActionKind,
+        tier: ListeningTier,
+        isSessionUnlocked: Bool,
+        isDeskActive: Bool,
+        hasPrivilegedConfirmation: Bool,
+        privilegedRateLimitAllows: Bool
+    ) -> LocalActionDispatchDecision {
+        guard isSessionUnlocked else { return .deny(.sessionLocked) }
+        guard tier.allowsActions else { return .deny(.notArmed(tier)) }
+        guard isDeskActive else { return .deny(.deskInactive) }
+        guard decision.wasAccepted else { return .deny(.notAccepted) }
+
+        guard ActionAuthorization.isPrivileged(actionKind) else { return .allow }
+        guard hasPrivilegedConfirmation else { return .deny(.awaitingConfirmation(actionKind)) }
+        guard privilegedRateLimitAllows else { return .deny(.rateLimited) }
+        return .allow
     }
 }

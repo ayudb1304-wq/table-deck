@@ -27,6 +27,18 @@ enum DiagnosticLabel: Hashable, Identifiable {
     }
 }
 
+/// A privileged action waiting for its one-time confirmation on this profile.
+struct PendingPrivilegedConfirmation: Identifiable, Equatable {
+    var id: String { "\(profileID.uuidString):\(kind.rawValue)" }
+    var profileID: UUID
+    var zone: DeskZone
+    var kind: ZoneActionKind
+
+    var prompt: String {
+        "\(zone.displayName) is assigned \"\(kind.displayName)\". Actions like this reach outside Holo, so it needs confirming once before a tap can run it."
+    }
+}
+
 enum HoloStorageError: Error, LocalizedError {
     case unavailable(String)
 
@@ -62,6 +74,11 @@ final class AppModel: ObservableObject {
     @Published private(set) var hasDebugRecordings = false
     @Published var errorMessage: String?
 
+    @Published private(set) var listeningTier: ListeningTier = .paused
+    @Published private(set) var pauseReasons: [PauseReason] = []
+    @Published private(set) var listeningSettings = ListeningTierSettings()
+    @Published var pendingPrivilegedConfirmation: PendingPrivilegedConfirmation?
+
     let audio = AudioCaptureService()
     @Published var calibrationDraft = CalibrationDraft()
 
@@ -69,7 +86,14 @@ final class AppModel: ObservableObject {
     private let evaluationStore: EvaluationStore?
     private let comparisonStore: ApproachComparisonStore?
     private let debugStore: DebugRecordingStore?
+    private let listeningSettingsStore: ListeningSettingsStore?
+    private let consentStore: PrivilegedActionConsentStore?
     private let actionDispatcher = LocalActionDispatcher()
+    private let power = PowerStateObserver()
+    private var tierMachine = ListeningTierMachine()
+    private var privilegedConsent = PrivilegedActionConsent()
+    private var privilegedRateLimiter = PrivilegedActionRateLimiter()
+    private var tierTimer: Timer?
     private var recalibratingProfileID: UUID?
     private var calibrationAcceptAfter = Date.distantPast
     private var evaluationAcceptAfter = Date.distantPast
@@ -78,8 +102,9 @@ final class AppModel: ObservableObject {
     private var evaluationArmTask: Task<Void, Never>?
     private var benchmarkArmTask: Task<Void, Never>?
     private var activeZoneClearTask: Task<Void, Never>?
-    private var pausedByUser = false
     private var cancellables: Set<AnyCancellable> = []
+
+    private var monotonicNow: Double { ProcessInfo.processInfo.systemUptime }
 
     init() {
         var startupErrors: [String] = []
@@ -102,6 +127,25 @@ final class AppModel: ObservableObject {
         catch {
             debugStore = nil
             startupErrors.append("Debug recordings: \(error.localizedDescription)")
+        }
+        do { listeningSettingsStore = try ListeningSettingsStore() }
+        catch {
+            listeningSettingsStore = nil
+            startupErrors.append("Listening settings: \(error.localizedDescription)")
+        }
+        do { consentStore = try PrivilegedActionConsentStore() }
+        catch {
+            consentStore = nil
+            startupErrors.append("Action confirmations: \(error.localizedDescription)")
+        }
+
+        if let listeningSettingsStore {
+            do { listeningSettings = try listeningSettingsStore.load() }
+            catch { startupErrors.append("Listening settings: \(error.localizedDescription)") }
+        }
+        if let consentStore {
+            do { privilegedConsent = try consentStore.load() }
+            catch { startupErrors.append("Action confirmations: \(error.localizedDescription)") }
         }
 
         if let debugStore {
@@ -132,6 +176,12 @@ final class AppModel: ObservableObject {
             errorMessage = "Some local data could not be opened:\n\n" + startupErrors.joined(separator: "\n")
         }
 
+        tierMachine = ListeningTierMachine(
+            settings: listeningSettings,
+            startedAt: ProcessInfo.processInfo.systemUptime
+        )
+        audio.setWakeGestureEnabled(listeningSettings.wakeGestureEnabled)
+
         audio.onObservation = { [weak self] observation in
             self?.handle(observation)
         }
@@ -140,6 +190,12 @@ final class AppModel: ObservableObject {
             self?.activeZone = nil
             self?.statusMessage = "Built-in audio route required"
             self?.errorMessage = message
+        }
+        audio.onWakeGesture = { [weak self] in
+            self?.handleWakeGesture()
+        }
+        power.onChange = { [weak self] _ in
+            self?.refreshTier()
         }
         actionDispatcher.onAsyncError = { [weak self] error in
             self?.errorMessage = "The assigned action failed. \(error.localizedDescription)"
@@ -182,7 +238,15 @@ final class AppModel: ObservableObject {
 
     func activate() async {
         do {
-            try await audio.start(strategy: targetStrategy)
+            tierMachine.noteWake(at: monotonicNow)
+            let decision = tierMachine.evaluate(power.conditions, at: monotonicNow)
+            publish(decision)
+            guard decision.tier != .paused else {
+                statusMessage = decision.statusText
+                return
+            }
+            try await audio.apply(tier: decision.tier, strategy: targetStrategy)
+            power.setEngineRunning(audio.isListening)
             if let zone = calibrationSession?.currentZone {
                 statusMessage = "Calibration ready • move to \(zone.displayName), then arm"
             } else if let zone = evaluationSession?.currentZone {
@@ -203,6 +267,7 @@ final class AppModel: ObservableObject {
     }
 
     func activateOnLaunch() async {
+        startTierObservation()
         guard selectedProfile != nil else {
             section = .calibrate
             statusMessage = "Setup required • calibrate the four desk zones"
@@ -223,17 +288,113 @@ final class AppModel: ObservableObject {
 
     func togglePause() {
         if audio.isListening {
-            pausedByUser = true
             disarmAllCaptureIntents()
-            audio.stop()
-            statusMessage = "Paused"
             activeZone = nil
+            power.setManuallyPaused(true)
         } else if selectedProfile == nil && guidedSection == nil {
             openSetup()
         } else {
-            pausedByUser = false
+            resumeFromManualPause()
             Task { await activate() }
         }
+    }
+
+    // MARK: - Listening tier
+
+    /// Starts the system observers and the coarse idle timer. Called once, from
+    /// `activateOnLaunch`, so that unit-constructed models stay inert.
+    func startTierObservation() {
+        guard tierTimer == nil else { return }
+        power.start()
+        // The doze transition is the only tier change with no notification
+        // behind it, so it needs a poll. Five seconds is far finer than the
+        // three-minute default timeout and costs one comparison per tick.
+        let timer = Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { [weak self] _ in
+            Task { @MainActor [weak self] in self?.refreshTier() }
+        }
+        timer.tolerance = 2
+        RunLoop.main.add(timer, forMode: .common)
+        tierTimer = timer
+        refreshTier()
+    }
+
+    func updateListeningSettings(_ settings: ListeningTierSettings) {
+        let sanitized = settings.sanitized()
+        listeningSettings = sanitized
+        tierMachine.settings = sanitized
+        audio.setWakeGestureEnabled(sanitized.wakeGestureEnabled)
+        do {
+            guard let listeningSettingsStore else { throw HoloStorageError.unavailable("Listening settings") }
+            try listeningSettingsStore.save(sanitized)
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+        refreshTier()
+    }
+
+    private func resumeFromManualPause() {
+        power.setManuallyPaused(false)
+        tierMachine.noteWake(at: monotonicNow)
+    }
+
+    private func handleWakeGesture() {
+        guard listeningSettings.wakeGestureEnabled else { return }
+        tierMachine.noteWake(at: monotonicNow)
+        refreshTier()
+    }
+
+    /// Recomputes the tier from current conditions and drives capture to match.
+    /// Every path that can change a condition ends here.
+    private func refreshTier() {
+        var decision = tierMachine.evaluate(power.conditions, at: monotonicNow)
+        // Guided capture never dozes. The user is standing at the desk waiting
+        // to be told when to tap, and the idle countdown only counts taps that
+        // reached the live pipeline.
+        if guidedSection != nil, decision.tier == .doze {
+            tierMachine.noteWake(at: monotonicNow)
+            decision = tierMachine.evaluate(power.conditions, at: monotonicNow)
+        }
+        let changed = decision.tier != listeningTier
+        publish(decision)
+
+        if decision.tier == .paused {
+            if changed {
+                disarmAllCaptureIntents()
+                activeZone = nil
+                privilegedRateLimiter.reset()
+            }
+            if audio.isListening {
+                audio.stop()
+                power.setEngineRunning(false)
+            }
+            if changed, guidedSection == nil { statusMessage = decision.statusText }
+            return
+        }
+
+        guard selectedProfile != nil || guidedSection != nil else { return }
+        guard audio.authorizationState == .authorized || audio.isListening else { return }
+
+        if changed, guidedSection == nil {
+            statusMessage = decision.tier == .doze
+                ? "Dozing, measuring loudness only"
+                : "Listening for desk taps"
+        }
+
+        Task { [weak self] in
+            guard let self else { return }
+            do {
+                try await self.audio.apply(tier: decision.tier, strategy: self.targetStrategy)
+                self.power.setEngineRunning(self.audio.isListening)
+            } catch is CancellationError {
+            } catch {
+                self.errorMessage = error.localizedDescription
+            }
+        }
+    }
+
+    private func publish(_ decision: ListeningTierDecision) {
+        listeningTier = decision.tier
+        pauseReasons = decision.pauseReasons
     }
 
     func openSetup() {
@@ -259,7 +420,7 @@ final class AppModel: ObservableObject {
     }
 
     func beginCalibration(draft: CalibrationDraft, recalibrating: HoloProfile? = nil) {
-        pausedByUser = false
+        resumeFromManualPause()
         calibrationArmTask?.cancel()
         evaluationArmTask?.cancel()
         benchmarkArmTask?.cancel()
@@ -467,7 +628,7 @@ final class AppModel: ObservableObject {
             errorMessage = "Calibrate a desk profile before evaluating it."
             return
         }
-        pausedByUser = false
+        resumeFromManualPause()
         calibrationSession = nil
         benchmarkSession = nil
         calibrationArmTask?.cancel()
@@ -523,7 +684,7 @@ final class AppModel: ObservableObject {
     }
 
     func beginApproachBenchmark() {
-        pausedByUser = false
+        resumeFromManualPause()
         calibrationArmTask?.cancel()
         evaluationArmTask?.cancel()
         benchmarkArmTask?.cancel()
@@ -632,6 +793,17 @@ final class AppModel: ObservableObject {
             guard let profileStore else { throw HoloStorageError.unavailable("Desk profile") }
             try profileStore.save(updatedProfile)
             profiles[profileIndex] = updatedProfile
+            // Ask at assignment time rather than at the moment a tap fires, so
+            // the confirmation lands while the user is looking at the action
+            // they just chose.
+            if ActionAuthorization.isPrivileged(action.kind),
+               !privilegedConsent.isGranted(profileID: updatedProfile.id, kind: action.kind) {
+                requestPrivilegedConfirmation(
+                    profileID: updatedProfile.id,
+                    zone: zone,
+                    kind: action.kind
+                )
+            }
             return true
         } catch {
             errorMessage = error.localizedDescription
@@ -650,6 +822,10 @@ final class AppModel: ObservableObject {
             guard let profileStore else { throw HoloStorageError.unavailable("Desk profile") }
             try profileStore.delete(profile)
             profiles.removeAll { $0.id == profile.id }
+            // A future profile could reuse this UUID; it must not inherit the
+            // deleted profile's confirmations.
+            privilegedConsent.revokeAll(profileID: profile.id)
+            persistPrivilegedConsent()
             selectedProfileID = profiles.first?.id
             refreshLatestEvaluation()
             if let nextProfile = selectedProfile {
@@ -666,6 +842,12 @@ final class AppModel: ObservableObject {
     }
 
     private func handle(_ observation: TapObservation) {
+        // Defense in depth. Capture is already stopped when the session locks,
+        // so reaching here with a non-Armed tier means an observation was in
+        // flight across the transition. It is dropped whole: not recorded, not
+        // classified, not counted toward a guided session.
+        guard listeningTier == .armed, !power.conditions.isScreenLocked else { return }
+
         if debugRecordingEnabled {
             let label = currentCaptureLabel
             do {
@@ -746,22 +928,78 @@ final class AppModel: ObservableObject {
         var decision = profile.classifier.predict(observation.feature)
         decision.processingLatencyMilliseconds = observation.processingLatencyMilliseconds
         present(decision)
-        if let zone = decision.zone {
-            if LocalActionDispatchPolicy.allowsAutomaticDispatch(
-                for: decision,
-                isDeskActive: section == .live
-            ) {
-                statusMessage = "\(zone.displayName) • \(Int(decision.confidence * 100))% confidence"
-                do { try actionDispatcher.perform(profile.action(for: zone)) }
-                catch {
-                    statusMessage = "\(zone.displayName) accepted • action failed"
-                    errorMessage = error.localizedDescription
-                }
-            } else {
-                statusMessage = "\(zone.displayName) detected • actions paused outside Desk"
-            }
-        } else {
+        guard let zone = decision.zone else {
             statusMessage = "Rejected • \(decision.rejectionReason?.displayName ?? "low confidence")"
+            return
+        }
+
+        // An accepted tap is the clearest possible signal that the user is at
+        // the desk, so it restarts the idle countdown even if the action is
+        // then denied.
+        tierMachine.noteAcceptedTap(at: monotonicNow)
+
+        let action = profile.action(for: zone)
+        let now = monotonicNow
+        let dispatch = LocalActionDispatchPolicy.decide(
+            for: decision,
+            actionKind: action.kind,
+            tier: listeningTier,
+            isSessionUnlocked: !power.conditions.isScreenLocked,
+            isDeskActive: section == .live,
+            hasPrivilegedConfirmation: privilegedConsent.isGranted(profileID: profile.id, kind: action.kind),
+            privilegedRateLimitAllows: privilegedRateLimiter.allows(at: now)
+        )
+
+        switch dispatch {
+        case .allow:
+            statusMessage = "\(zone.displayName) • \(Int(decision.confidence * 100))% confidence"
+            do {
+                try actionDispatcher.perform(action)
+                if ActionAuthorization.isPrivileged(action.kind) {
+                    privilegedRateLimiter.noteDispatch(at: now)
+                }
+            } catch {
+                statusMessage = "\(zone.displayName) accepted • action failed"
+                errorMessage = error.localizedDescription
+            }
+        case .deny(.awaitingConfirmation(let kind)):
+            statusMessage = "\(zone.displayName) • confirmation needed"
+            requestPrivilegedConfirmation(profileID: profile.id, zone: zone, kind: kind)
+        case .deny(.deskInactive):
+            statusMessage = "\(zone.displayName) detected • actions paused outside Desk"
+        case .deny(let reason):
+            statusMessage = "\(zone.displayName) detected • \(reason.explanation)"
+        }
+    }
+
+    // MARK: - Privileged action confirmation
+
+    private func requestPrivilegedConfirmation(profileID: UUID, zone: DeskZone, kind: ZoneActionKind) {
+        guard pendingPrivilegedConfirmation == nil else { return }
+        pendingPrivilegedConfirmation = PendingPrivilegedConfirmation(
+            profileID: profileID,
+            zone: zone,
+            kind: kind
+        )
+    }
+
+    func confirmPendingPrivilegedAction() {
+        guard let pending = pendingPrivilegedConfirmation else { return }
+        pendingPrivilegedConfirmation = nil
+        privilegedConsent.grant(profileID: pending.profileID, kind: pending.kind)
+        persistPrivilegedConsent()
+    }
+
+    func declinePendingPrivilegedAction() {
+        pendingPrivilegedConfirmation = nil
+    }
+
+    private func persistPrivilegedConsent() {
+        do {
+            guard let consentStore else { throw HoloStorageError.unavailable("Action confirmations") }
+            try consentStore.save(privilegedConsent)
+        } catch {
+            errorMessage = error.localizedDescription
         }
     }
 
@@ -969,16 +1207,23 @@ final class AppModel: ObservableObject {
 
     private func reconfigureListeningAudio(to strategy: SensingStrategy) async throws {
         guard audio.isListening else { return }
-        try await audio.reconfigure(strategy: strategy)
+        try await audio.apply(tier: listeningTier, strategy: strategy)
+        power.setEngineRunning(audio.isListening)
     }
 
+    /// Guided capture always wants Armed: calibration and accuracy tests need
+    /// the full pipeline, and the user is demonstrably at the machine. A system
+    /// pause (locked, in a call, out of battery) still wins.
     private func prepareGuidedAudio(to strategy: SensingStrategy) async throws {
-        guard !pausedByUser else { return }
-        if audio.isListening {
-            try await audio.reconfigure(strategy: strategy)
-        } else {
-            try await audio.start(strategy: strategy)
+        tierMachine.noteWake(at: monotonicNow)
+        let decision = tierMachine.evaluate(power.conditions, at: monotonicNow)
+        publish(decision)
+        guard decision.tier != .paused else {
+            statusMessage = decision.statusText
+            return
         }
+        try await audio.apply(tier: .armed, strategy: strategy)
+        power.setEngineRunning(audio.isListening)
     }
 
     private func draft(for profile: HoloProfile) -> CalibrationDraft {
